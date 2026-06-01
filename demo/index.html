@@ -1,0 +1,1639 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>나와 (NAWA) — 자립준비청년 복지 통합지원</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --g9:#072212;--g8:#0F3520;--g7:#1A6B4A;--g6:#2D9B6F;--g5:#42B885;
+  --g4:#56C794;--g3:#85D9B0;--g2:#C0EDDA;--g1:#E8F7F0;--g0:#F0F9F4;
+  --bg:#F5F8F6;--card:#fff;--b1:#111827;--b2:#374151;--b3:#6B7280;--b4:#9CA3AF;
+  --bdr:#E8EAED;--red:#EF4444;--red-bg:#FFF1F1;--org:#F97316;--org-bg:#FFF7ED;
+  --yel:#D97706;--yel-bg:#FFFBEB;--blu:#2563EB;--blu-bg:#EFF6FF;
+  --r:14px;--r-sm:8px;--r-lg:22px;--r-xl:32px;
+  --sh:0 2px 16px rgba(0,0,0,.07);--sh-lg:0 8px 36px rgba(0,0,0,.13);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased}
+html,body{height:100%;font-family:'Noto Sans KR',-apple-system,sans-serif}
+body{background:radial-gradient(ellipse at 30% 20%,#0D2B3E 0%,#08160F 50%,#0A1F18 100%);
+  display:flex;justify-content:center;align-items:center;min-height:100vh;padding:20px;gap:40px}
+
+/* ── Phone Shell ── */
+.shell{
+  width:390px;height:844px;background:#111;border-radius:56px;padding:11px;
+  box-shadow:0 0 0 1px rgba(255,255,255,.1),0 0 0 2px rgba(255,255,255,.04),
+    0 50px 120px rgba(0,0,0,.9),0 0 80px rgba(45,155,111,.12);
+  flex-shrink:0;position:relative;
+}
+.phone{width:100%;height:100%;border-radius:47px;overflow:hidden;position:relative;background:var(--bg)}
+.notch{position:absolute;top:0;left:50%;transform:translateX(-50%);
+  width:120px;height:36px;background:#111;border-radius:0 0 22px 22px;z-index:200}
+
+/* Status bar */
+.sbar{
+  position:absolute;top:0;left:0;right:0;height:52px;
+  display:flex;justify-content:space-between;align-items:flex-end;
+  padding:0 28px 10px;z-index:150;pointer-events:none;transition:color .3s
+}
+.sbar.dark{color:rgba(255,255,255,.95)}
+.sbar.light{color:var(--b1)}
+.sbar-time{font-size:15px;font-weight:700}
+.sbar-icons{font-size:12px;display:flex;align-items:center;gap:4px}
+
+/* Screens */
+.screens{position:absolute;inset:0}
+.screen{
+  position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;
+  transform:translateX(110%);transition:transform .38s cubic-bezier(.22,1,.36,1);
+  will-change:transform;scrollbar-width:none;background:var(--bg)
+}
+.screen::-webkit-scrollbar{display:none}
+.screen.active{transform:translateX(0)}
+.screen.behind{transform:translateX(-22%)}
+
+/* Tab bar */
+.tabs{
+  position:absolute;bottom:0;left:0;right:0;height:84px;
+  background:rgba(255,255,255,.97);backdrop-filter:blur(24px);
+  border-top:1px solid rgba(0,0,0,.06);display:flex;z-index:120;
+  opacity:0;pointer-events:none;transition:opacity .25s
+}
+.tabs.show{opacity:1;pointer-events:all}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:4px;cursor:pointer;padding-bottom:14px;position:relative}
+.tab::before{content:'';position:absolute;top:8px;left:50%;transform:translateX(-50%);
+  width:44px;height:30px;border-radius:10px;transition:background .2s}
+.tab.on::before{background:var(--g0)}
+.tab-ico{font-size:22px;position:relative;z-index:1;line-height:1}
+.tab-lbl{font-size:10px;font-weight:600;color:var(--b4);transition:color .2s;position:relative;z-index:1}
+.tab.on .tab-lbl{color:var(--g6)}
+
+/* ── GLOBAL COMPONENTS ── */
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:17px 20px;
+  border-radius:var(--r);font-size:16px;font-weight:700;font-family:inherit;
+  cursor:pointer;border:none;width:100%;transition:transform .12s,box-shadow .15s,opacity .12s}
+.btn:active{transform:scale(.97)}
+.btn-p{background:var(--g6);color:#fff;box-shadow:0 4px 18px rgba(45,155,111,.32)}
+.btn-p:active{box-shadow:0 2px 8px rgba(45,155,111,.2)}
+.btn-w{background:#fff;color:var(--g8)}
+.btn-o{background:transparent;color:var(--g6);border:1.5px solid var(--g6)}
+.btn-ghost{background:transparent;color:var(--b3);border:1.5px solid var(--bdr)}
+.btn-sm{padding:11px 16px;font-size:14px;border-radius:var(--r-sm)}
+.btn:disabled{opacity:.45;cursor:default}
+
+.chip{display:inline-flex;align-items:center;padding:8px 14px;border-radius:20px;
+  border:1.5px solid var(--bdr);background:#fff;font-size:13px;font-weight:500;
+  color:var(--b2);cursor:pointer;transition:all .15s;font-family:inherit;white-space:nowrap}
+.chip.on{background:var(--g6);border-color:var(--g6);color:#fff}
+.chip:active{transform:scale(.95)}
+
+.inp{width:100%;padding:15px 16px;border:1.5px solid var(--bdr);border-radius:var(--r);
+  font-size:16px;font-family:inherit;color:var(--b1);background:#fff;outline:none;
+  transition:border-color .2s}
+.inp:focus{border-color:var(--g6)}
+
+.badge{display:inline-flex;align-items:center;gap:3px;padding:3px 8px;
+  border-radius:6px;font-size:11px;font-weight:700;line-height:1.4}
+.badge-red{background:var(--red-bg);color:var(--red)}
+.badge-org{background:var(--org-bg);color:var(--org)}
+.badge-yel{background:var(--yel-bg);color:var(--yel)}
+.badge-grn{background:var(--g0);color:var(--g7)}
+.badge-gry{background:#F3F4F6;color:var(--b3)}
+.badge-blu{background:var(--blu-bg);color:var(--blu)}
+
+/* Cards */
+.wcard{background:#fff;border-radius:var(--r);padding:15px 14px;display:flex;
+  align-items:flex-start;gap:12px;box-shadow:var(--sh);cursor:pointer;
+  transition:transform .15s,box-shadow .15s;border:1px solid transparent;margin-bottom:10px}
+.wcard:active{transform:scale(.98);box-shadow:var(--sh-lg)}
+.wcard.urgent{border-left:3px solid var(--red)}
+.wcard.very-urgent{background:linear-gradient(135deg,#fff 0%,#fffafa 100%);border:1.5px solid rgba(239,68,68,.15)}
+
+.cico{width:46px;height:46px;border-radius:13px;background:var(--g0);
+  display:flex;align-items:center;justify-content:center;font-size:23px;flex-shrink:0}
+.cico.red{background:var(--red-bg)}
+.cico.yel{background:var(--yel-bg)}
+.cico.blu{background:var(--blu-bg)}
+.cico.org{background:var(--org-bg)}
+.cico.pur{background:#F5F3FF}
+
+.cbody{flex:1;min-width:0}
+.cname{font-size:15px;font-weight:700;color:var(--b1);margin-bottom:3px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cbenefit{font-size:13px;color:var(--b3);margin-bottom:6px}
+.cmeta{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+
+.cact{width:36px;height:36px;border-radius:18px;background:#F3F4F6;
+  display:flex;align-items:center;justify-content:center;font-size:18px;
+  flex-shrink:0;cursor:pointer;transition:all .2s;border:none;font-family:inherit}
+.cact.saved{background:var(--g0);color:var(--g6)}
+
+/* Progress */
+.pbar{height:4px;background:var(--bdr);border-radius:2px;overflow:hidden}
+.pfill{height:100%;background:var(--g6);border-radius:2px;transition:width .4s ease}
+
+/* Checkbox */
+.cbox{width:24px;height:24px;border-radius:7px;border:2px solid var(--bdr);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  transition:all .2s;flex-shrink:0;font-size:13px;color:transparent;background:#fff}
+.cbox.chk{background:var(--g6);border-color:var(--g6);color:#fff}
+
+.chk-item{display:flex;align-items:flex-start;gap:12px;padding:12px 0;
+  border-bottom:1px solid #F5F5F5}
+.chk-item:last-child{border-bottom:none}
+
+/* Status card (onboarding) */
+.scard{display:flex;align-items:center;gap:14px;padding:15px 16px;
+  border-radius:var(--r);border:1.5px solid var(--bdr);background:#fff;
+  cursor:pointer;transition:all .15s;margin-bottom:10px}
+.scard.on{border-color:var(--g6);background:var(--g0)}
+.scard:active{transform:scale(.98)}
+
+/* Section headers */
+.sec-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.sec-ttl{font-size:16px;font-weight:700;color:var(--b1)}
+.sec-cnt{font-size:13px;color:var(--b4)}
+
+/* Notification banner */
+.notif{border-radius:var(--r);padding:14px 16px;display:flex;align-items:flex-start;gap:10px;margin-bottom:14px}
+.notif.warn{background:var(--yel-bg);border:1px solid rgba(217,119,6,.15)}
+.notif.info{background:var(--g0);border:1px solid rgba(45,155,111,.15)}
+.notif.err{background:var(--red-bg);border:1px solid rgba(239,68,68,.15)}
+
+/* Disclaimer */
+.disc{background:var(--yel-bg);border-radius:var(--r);padding:13px;margin-top:16px}
+.disc p{font-size:11px;color:#78350F;line-height:1.7}
+
+/* Animations */
+@keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+@keyframes ping{0%{transform:scale(1);opacity:.9}100%{transform:scale(1.8);opacity:0}}
+@keyframes shimmer{0%{opacity:.4}50%{opacity:1}100%{opacity:.4}}
+@keyframes popIn{from{transform:scale(.7);opacity:0}to{transform:scale(1);opacity:1}}
+
+/* ═══════════════════════════
+   SCREEN 1 — WELCOME
+═══════════════════════════ */
+#s-welcome{background:linear-gradient(160deg,#061A0F 0%,#0D3520 18%,#1A6B4A 50%,#2D9B6F 78%,#4EB880 100%)}
+
+.welcome-body{padding:52px 24px 44px;min-height:100%;display:flex;flex-direction:column}
+.welcome-logo-area{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px 0}
+.logo-main{font-size:64px;font-weight:900;color:#fff;letter-spacing:-3px;line-height:1;margin-bottom:4px}
+.logo-en{font-size:13px;font-weight:600;color:rgba(255,255,255,.6);letter-spacing:8px;margin-bottom:24px}
+.logo-tag{font-size:17px;font-weight:500;color:rgba(255,255,255,.9);text-align:center;line-height:1.55}
+
+.feat-cards{display:flex;flex-direction:column;gap:9px;margin:24px 0}
+.feat-card{background:rgba(255,255,255,.12);backdrop-filter:blur(12px);border-radius:16px;
+  padding:14px 16px;display:flex;align-items:center;gap:14px;
+  border:1px solid rgba(255,255,255,.15)}
+.feat-ico{font-size:24px;flex-shrink:0}
+.feat-txt{font-size:13.5px;color:rgba(255,255,255,.9);line-height:1.55;font-weight:400}
+
+.welcome-btns{display:flex;flex-direction:column;gap:11px}
+.privacy-note{text-align:center;font-size:11px;color:rgba(255,255,255,.45);margin-top:6px;line-height:1.5}
+
+/* ═══════════════════════════
+   SCREENS 2-6 — ONBOARDING
+═══════════════════════════ */
+.ob-body{padding:60px 24px 100px;min-height:100%}
+.ob-prog{display:flex;gap:5px;margin-bottom:28px}
+.ob-dot{flex:1;height:4px;border-radius:2px;background:var(--bdr);transition:background .3s}
+.ob-dot.done{background:var(--g6)}
+.ob-ttl{font-size:26px;font-weight:800;color:var(--b1);margin-bottom:6px;line-height:1.25}
+.ob-sub{font-size:15px;color:var(--b3);margin-bottom:28px;line-height:1.55}
+.ob-fields{display:flex;flex-direction:column;gap:22px}
+.ob-field{display:flex;flex-direction:column;gap:8px}
+.field-lbl{font-size:14px;font-weight:600;color:var(--b2)}
+.chips-wrap{display:flex;flex-wrap:wrap;gap:8px}
+.ob-footer{position:absolute;bottom:0;left:0;right:0;padding:12px 24px 34px;
+  background:rgba(245,248,246,.97);backdrop-filter:blur(20px);
+  border-top:1px solid rgba(0,0,0,.05);display:flex;gap:10px}
+
+/* ═══════════════════════════
+   SCREEN 7 — MATCHING
+═══════════════════════════ */
+#s-matching{background:linear-gradient(160deg,#0F3520 0%,#1A6B4A 50%,#2D9B6F 100%)}
+.match-body{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:100%;padding:40px 32px;text-align:center}
+.match-logo{font-size:72px;font-weight:900;color:#fff;animation:float 2.5s ease-in-out infinite;margin-bottom:24px}
+.match-ttl{font-size:22px;font-weight:700;color:#fff;margin-bottom:8px}
+.match-sub{font-size:15px;color:rgba(255,255,255,.7);margin-bottom:36px}
+.match-steps{width:100%;display:flex;flex-direction:column;gap:10px}
+.match-step{display:flex;align-items:center;gap:12px;padding:12px 16px;
+  background:rgba(255,255,255,.1);border-radius:12px;border:1px solid rgba(255,255,255,.12)}
+.mstep-ico{font-size:20px;width:30px;text-align:center}
+.mstep-txt{font-size:14px;color:rgba(255,255,255,.85);font-weight:500;flex:1;text-align:left}
+.mstep-chk{font-size:16px}
+.match-result{margin-top:28px;padding:20px;background:rgba(255,255,255,.15);
+  border-radius:20px;border:1px solid rgba(255,255,255,.2);animation:popIn .5s ease}
+.result-num{font-size:52px;font-weight:900;color:#fff;line-height:1}
+.result-lbl{font-size:15px;color:rgba(255,255,255,.8);margin-top:4px;font-weight:500}
+
+/* ═══════════════════════════
+   SCREEN 8 — HOME
+═══════════════════════════ */
+.home-header{padding:56px 20px 12px;display:flex;justify-content:space-between;align-items:flex-end}
+.home-greeting{display:flex;flex-direction:column;gap:2px}
+.home-logo{font-size:28px;font-weight:900;color:var(--b1);letter-spacing:-1px}
+.home-sub{font-size:13px;color:var(--b3)}
+.refresh-btn{width:40px;height:40px;border-radius:20px;background:var(--g0);
+  display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;
+  border:none;font-family:inherit;transition:transform .2s}
+.refresh-btn:active{transform:rotate(180deg)}
+
+.stat-strip{margin:0 20px 14px;background:linear-gradient(135deg,var(--g7),var(--g6));
+  border-radius:16px;padding:14px 16px;display:flex;gap:0}
+.stat-item{flex:1;text-align:center;position:relative}
+.stat-item+.stat-item::before{content:'';position:absolute;left:0;top:10%;height:80%;
+  width:1px;background:rgba(255,255,255,.2)}
+.stat-num{font-size:24px;font-weight:900;color:#fff;line-height:1}
+.stat-lbl{font-size:11px;color:rgba(255,255,255,.75);margin-top:3px;font-weight:500}
+
+.cat-scroll{display:flex;gap:8px;padding:0 20px 14px;overflow-x:auto;scrollbar-width:none}
+.cat-scroll::-webkit-scrollbar{display:none}
+
+.home-content{padding:0 20px 96px}
+
+.jarip-banner{background:var(--yel-bg);border:1px solid rgba(217,119,6,.2);border-radius:14px;
+  padding:13px 14px;display:flex;align-items:center;gap:10px;margin-bottom:16px;cursor:pointer}
+.jb-icon{font-size:22px}
+.jb-body{flex:1}
+.jb-ttl{font-size:13px;font-weight:700;color:#92400E}
+.jb-sub{font-size:11.5px;color:#78350F;margin-top:2px}
+.jb-arr{color:var(--yel);font-size:16px}
+
+/* ═══════════════════════════
+   SCREEN 9 — DETAIL MODAL
+═══════════════════════════ */
+#s-detail{background:#fff}
+.detail-hero{height:200px;background:linear-gradient(140deg,#0F3520,#2D9B6F);
+  padding:56px 20px 20px;display:flex;flex-direction:column;justify-content:flex-end;position:relative}
+.detail-close{position:absolute;top:56px;right:20px;width:34px;height:34px;
+  border-radius:17px;background:rgba(255,255,255,.2);display:flex;align-items:center;
+  justify-content:center;font-size:18px;cursor:pointer;color:#fff;border:none;font-family:inherit}
+.detail-source{font-size:12px;color:rgba(255,255,255,.7);font-weight:600;margin-bottom:6px}
+.detail-title{font-size:22px;font-weight:800;color:#fff;line-height:1.25}
+.detail-op{font-size:13px;color:rgba(255,255,255,.7);margin-top:4px}
+
+.urgent-bar{background:var(--red-bg);padding:13px 20px;display:flex;align-items:center;gap:9px}
+.ub-txt{font-size:13.5px;font-weight:700;color:var(--red)}
+
+.detail-body{padding:20px}
+.detail-sec{margin-bottom:22px}
+.detail-sec-ttl{font-size:15px;font-weight:700;color:var(--b1);margin-bottom:12px}
+.detail-card{background:var(--bg);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:10px}
+.info-row{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.info-lbl{font-size:14px;color:var(--b3);flex:1}
+.info-val{font-size:14px;font-weight:600;color:var(--b1);flex:2;text-align:right;line-height:1.4}
+.bull-row{display:flex;gap:8px;align-items:flex-start}
+.bull{color:var(--g6);font-weight:700;margin-top:1px;flex-shrink:0}
+.bull-txt{font-size:14px;color:var(--b2);line-height:1.55}
+.doc-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--bdr)}
+.doc-row:last-child{border-bottom:none}
+.doc-name{font-size:14px;font-weight:600;color:var(--b2)}
+.doc-guide{font-size:11.5px;color:var(--b4);margin-top:2px}
+
+.detail-footer{position:sticky;bottom:0;background:#fff;padding:12px 20px 32px;
+  border-top:1px solid var(--bdr);display:flex;flex-direction:column;gap:10px}
+
+/* ═══════════════════════════
+   SCREEN 10 — APPLICATIONS
+═══════════════════════════ */
+.app-header{padding:56px 20px 16px}
+.app-title{font-size:26px;font-weight:800;color:var(--b1)}
+.app-sub{font-size:13px;color:var(--b3);margin-top:3px}
+
+.app-content{padding:0 20px 96px;display:flex;flex-direction:column;gap:12px}
+
+.app-card{background:#fff;border-radius:var(--r);box-shadow:var(--sh);overflow:hidden}
+.app-card-hd{padding:15px 16px;display:flex;align-items:center;gap:12px;cursor:pointer}
+.app-card-hd:active{background:#FAFAFA}
+.app-prog-wrap{padding:0 16px 12px;display:flex;align-items:center;gap:8px}
+.app-prog-lbl{font-size:12px;color:var(--b4);min-width:28px;text-align:right}
+.app-card-body{padding:0 16px 16px;border-top:1px solid var(--bdr)}
+.app-sec-ttl{font-size:13px;font-weight:700;color:var(--b2);margin:14px 0 10px}
+.checklist{display:flex;flex-direction:column}
+.ai-btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;
+  border-radius:var(--r-sm);border:1.5px solid var(--g6);cursor:pointer;
+  background:#fff;font-family:inherit;font-size:14px;font-weight:700;color:var(--g6);
+  margin-top:14px;transition:all .15s}
+.ai-btn:active{background:var(--g0)}
+.apply-btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;
+  border-radius:var(--r-sm);background:var(--g6);cursor:pointer;
+  font-family:inherit;font-size:14px;font-weight:700;color:#fff;margin-top:10px;border:none;
+  transition:all .15s}
+.apply-btn:active{opacity:.85}
+.done-btn{padding:13px;border-radius:var(--r-sm);background:var(--g0);cursor:pointer;
+  font-family:inherit;font-size:14px;font-weight:600;color:var(--g7);
+  margin-top:10px;text-align:center;border:none;width:100%;transition:all .15s}
+.done-btn:active{opacity:.8}
+
+.app-submitted{display:flex;align-items:center;gap:10px;padding:14px 16px;
+  background:var(--g0);border-radius:var(--r);border:1.5px solid rgba(45,155,111,.2)}
+.submit-icon{font-size:24px}
+.submit-ttl{font-size:14px;font-weight:700;color:var(--g7)}
+.submit-date{font-size:12px;color:var(--b3);margin-top:2px}
+
+/* AI draft overlay */
+.ai-overlay{position:absolute;inset:0;background:rgba(0,0,0,.5);z-index:300;
+  display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .3s}
+.ai-overlay.show{opacity:1;pointer-events:all}
+.ai-sheet{background:#fff;border-radius:28px 28px 0 0;padding:20px 20px 44px;max-height:75%;overflow-y:auto}
+.ai-sheet-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.ai-sheet-ttl{font-size:17px;font-weight:700;color:var(--b1)}
+.ai-close{font-size:24px;cursor:pointer;background:none;border:none;color:var(--b3);font-family:inherit}
+.ai-disc{background:var(--yel-bg);border-radius:var(--r-sm);padding:11px;margin-bottom:14px}
+.ai-disc p{font-size:11px;color:#78350F;line-height:1.6}
+.ai-content{font-size:14px;color:var(--b2);line-height:1.75;white-space:pre-wrap}
+
+/* ═══════════════════════════
+   SCREEN 11 — SITUATION
+═══════════════════════════ */
+.sit-header{padding:56px 20px 20px}
+.sit-title{font-size:26px;font-weight:800;color:var(--b1)}
+.sit-sub{font-size:14px;color:var(--b3);margin-top:4px;line-height:1.55}
+
+.sit-content{padding:0 20px 96px;display:flex;flex-direction:column;gap:10px}
+
+.sit-card{background:#fff;border-radius:var(--r);padding:16px;display:flex;align-items:center;
+  gap:13px;box-shadow:var(--sh);cursor:pointer;transition:all .15s;border:1.5px solid transparent}
+.sit-card.picked{border-color:var(--g6);background:var(--g0)}
+.sit-card:active{transform:scale(.98)}
+.sit-ico{font-size:26px;flex-shrink:0}
+.sit-body{flex:1}
+.sit-ttl{font-size:15px;font-weight:700;color:var(--b1)}
+.sit-desc{font-size:12.5px;color:var(--b3);margin-top:2px}
+.sit-chk{width:24px;height:24px;border-radius:12px;border:2px solid var(--bdr);
+  display:flex;align-items:center;justify-content:center;font-size:13px;
+  color:transparent;transition:all .2s;flex-shrink:0}
+.sit-card.picked .sit-chk{background:var(--g6);border-color:var(--g6);color:#fff}
+
+.sit-sub-expand{background:var(--bg);border-radius:0 0 var(--r) var(--r);padding:14px 16px;
+  display:flex;flex-direction:column;gap:10px;margin-top:-10px}
+.sit-sub-lbl{font-size:13px;font-weight:600;color:var(--b2)}
+.sit-chips{display:flex;flex-wrap:wrap;gap:8px}
+
+.sit-submit{margin:4px 20px 0}
+.no-change{text-align:center;font-size:12px;color:var(--b4);margin-top:10px;padding:0 20px}
+
+/* success overlay */
+.success-overlay{position:absolute;inset:0;background:rgba(0,0,0,.5);z-index:300;
+  display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
+.success-overlay.show{opacity:1;pointer-events:all}
+.success-card{background:#fff;border-radius:24px;padding:32px;text-align:center;width:300px;
+  animation:popIn .3s ease}
+.success-ico{font-size:56px;margin-bottom:16px;animation:float 2s ease-in-out infinite}
+.success-ttl{font-size:20px;font-weight:800;color:var(--b1);margin-bottom:8px}
+.success-sub{font-size:14px;color:var(--b3);line-height:1.55;margin-bottom:24px}
+
+/* ═══════════════════════════
+   SCREEN 12 — FEEDBACK
+═══════════════════════════ */
+.fb-header{padding:56px 20px 20px}
+.fb-title{font-size:26px;font-weight:800;color:var(--b1);line-height:1.25}
+.fb-sub{font-size:14px;color:var(--b3);margin-top:6px;line-height:1.55}
+
+.fb-content{padding:0 20px 96px;display:flex;flex-direction:column;gap:18px}
+.fb-sec-lbl{font-size:14px;font-weight:700;color:var(--b2)}
+.fb-cats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fb-cat{padding:14px;background:#fff;border-radius:var(--r);border:1.5px solid var(--bdr);
+  cursor:pointer;transition:all .15s}
+.fb-cat.on{border-color:var(--g6);background:var(--g0)}
+.fb-cat:active{transform:scale(.97)}
+.fb-cat-ico{font-size:22px;margin-bottom:6px}
+.fb-cat-ttl{font-size:14px;font-weight:700;color:var(--b1)}
+.fb-cat.on .fb-cat-ttl{color:var(--g7)}
+.fb-cat-desc{font-size:11.5px;color:var(--b4);margin-top:2px;line-height:1.4}
+
+.fb-textarea{width:100%;min-height:130px;padding:14px 15px;border:1.5px solid var(--bdr);
+  border-radius:var(--r);font-size:15px;font-family:inherit;color:var(--b1);background:#fff;
+  outline:none;resize:none;transition:border-color .2s;line-height:1.55}
+.fb-textarea:focus{border-color:var(--g6)}
+.fb-char{font-size:12px;color:var(--b4);text-align:right;margin-top:-12px}
+
+.anon-row{background:#fff;border-radius:var(--r);padding:15px 16px;
+  display:flex;justify-content:space-between;align-items:center;box-shadow:var(--sh)}
+.anon-lbl{font-size:15px;font-weight:600;color:var(--b1)}
+.anon-sub{font-size:12px;color:var(--b3);margin-top:2px}
+.toggle-wrap{position:relative;cursor:pointer}
+.toggle-input{opacity:0;width:0;height:0;position:absolute}
+.toggle-slider{width:48px;height:28px;background:#D1D5DB;border-radius:14px;
+  display:block;transition:background .2s;position:relative}
+.toggle-slider::after{content:'';position:absolute;width:22px;height:22px;
+  border-radius:11px;background:#fff;top:3px;left:3px;transition:transform .2s;
+  box-shadow:0 2px 4px rgba(0,0,0,.2)}
+.toggle-input:checked+.toggle-slider{background:var(--g6)}
+.toggle-input:checked+.toggle-slider::after{transform:translateX(20px)}
+
+/* ═══════════════════════════
+   SCREEN 13 — CASE WORKER
+═══════════════════════════ */
+.cw-header{padding:56px 20px 20px;background:linear-gradient(135deg,#0F3520,#1A6B4A)}
+.cw-badge{display:inline-block;padding:4px 10px;background:rgba(255,255,255,.15);
+  border-radius:20px;font-size:11px;font-weight:600;color:rgba(255,255,255,.8);margin-bottom:8px}
+.cw-ttl{font-size:22px;font-weight:800;color:#fff}
+.cw-sub{font-size:13px;color:rgba(255,255,255,.65);margin-top:3px}
+
+.cw-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:16px 20px}
+.cw-stat{background:#fff;border-radius:var(--r);padding:16px;box-shadow:var(--sh)}
+.cw-stat-num{font-size:28px;font-weight:900;color:var(--b1);line-height:1}
+.cw-stat-lbl{font-size:12px;color:var(--b3);margin-top:4px}
+.cw-stat.warn .cw-stat-num{color:var(--red)}
+.cw-stat.grn .cw-stat-num{color:var(--g6)}
+
+.cw-sec{padding:0 20px;margin-bottom:20px}
+.cw-sec-ttl{font-size:15px;font-weight:700;color:var(--b1);margin-bottom:12px}
+.cw-youth-card{background:#fff;border-radius:var(--r);padding:14px;display:flex;
+  align-items:center;gap:12px;box-shadow:var(--sh);margin-bottom:8px;cursor:pointer}
+.cw-youth-card:active{transform:scale(.98)}
+.cw-avatar{width:42px;height:42px;border-radius:21px;display:flex;align-items:center;
+  justify-content:center;font-size:18px;font-weight:700;color:#fff;flex-shrink:0}
+.cw-youth-name{font-size:14px;font-weight:700;color:var(--b1)}
+.cw-youth-sub{font-size:12px;color:var(--b3);margin-top:2px}
+.cw-risk-badge{padding:3px 8px;background:var(--red-bg);border-radius:6px;
+  font-size:11px;font-weight:700;color:var(--red);flex-shrink:0}
+.cw-ok-badge{padding:3px 8px;background:var(--g0);border-radius:6px;
+  font-size:11px;font-weight:600;color:var(--g7);flex-shrink:0}
+
+.cw-missed{background:#fff;border-radius:var(--r);overflow:hidden;box-shadow:var(--sh)}
+.cw-missed-item{display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid var(--bdr)}
+.cw-missed-item:last-child{border-bottom:none}
+.cw-missed-num{font-size:20px;font-weight:900;color:var(--red);min-width:30px}
+.cw-missed-name{font-size:13px;font-weight:600;color:var(--b1)}
+.cw-missed-cat{font-size:11.5px;color:var(--b3);margin-top:2px}
+
+.back-btn{display:flex;align-items:center;gap:6px;background:none;border:none;
+  font-family:inherit;font-size:14px;font-weight:600;color:var(--b3);cursor:pointer;
+  padding:0;margin-bottom:16px}
+.back-btn:active{opacity:.7}
+
+/* ═══════════════════════════
+   SIDE PANEL
+═══════════════════════════ */
+.side-info{color:#fff;max-width:280px}
+.side-ttl{font-size:22px;font-weight:800;margin-bottom:16px;line-height:1.3}
+.side-item{display:flex;gap:12px;margin-bottom:14px}
+.side-num{width:26px;height:26px;border-radius:13px;background:rgba(255,255,255,.15);
+  display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;margin-top:2px}
+.side-txt{font-size:14px;color:rgba(255,255,255,.8);line-height:1.6}
+.side-nav{margin-top:28px;display:flex;flex-direction:column;gap:8px}
+.side-nav-btn{padding:12px 16px;border-radius:12px;background:rgba(255,255,255,.1);
+  border:1px solid rgba(255,255,255,.15);font-family:inherit;font-size:14px;
+  font-weight:600;color:rgba(255,255,255,.85);cursor:pointer;text-align:left;transition:all .15s}
+.side-nav-btn:hover{background:rgba(255,255,255,.18)}
+.side-nav-btn.active-nav{background:rgba(255,255,255,.25);border-color:rgba(255,255,255,.3);color:#fff}
+
+@media(max-width:750px){.side-info{display:none}}
+</style>
+</head>
+<body>
+
+<!-- Side panel -->
+<div class="side-info">
+  <div class="side-ttl">나와 (NAWA)<br>자립준비청년<br>복지 통합지원</div>
+  <div class="side-item"><div class="side-num">1</div><div class="side-txt">9개 사이트 대신 <strong>한 곳</strong>에서 내 자격에 맞는 지원을 먼저 알려줘요</div></div>
+  <div class="side-item"><div class="side-num">2</div><div class="side-txt">서류 준비 → AI 초안 생성 → 신청 완료까지 <strong>전 과정 동행</strong></div></div>
+  <div class="side-item"><div class="side-num">3</div><div class="side-txt">이사·휴학·퇴사 시 자격을 <strong>자동 재매칭</strong>하고 자립수당 종결도 미리 안내</div></div>
+  <div class="side-item"><div class="side-num">4</div><div class="side-txt">14일 미접속 청년 신호를 <strong>전담기관에 자동 전달</strong> (B2G 수익 모델)</div></div>
+  <div class="side-nav" id="side-nav">
+    <button class="side-nav-btn active-nav" onclick="sideGo('s-welcome')">🌿 환영 화면</button>
+    <button class="side-nav-btn" onclick="sideGo('s-ob1')">📝 온보딩 (5단계)</button>
+    <button class="side-nav-btn" onclick="sideGo('s-matching')">🔍 자격 매칭 중</button>
+    <button class="side-nav-btn" onclick="sideGoTab('s-home')">🏠 홈 대시보드</button>
+    <button class="side-nav-btn" onclick="sideGoDetail()">📚 지원 상세</button>
+    <button class="side-nav-btn" onclick="sideGoTab('s-apps')">✅ 신청 관리</button>
+    <button class="side-nav-btn" onclick="sideGoTab('s-sit')">🔄 상황 업데이트</button>
+    <button class="side-nav-btn" onclick="sideGoTab('s-fb')">💬 제안하기</button>
+    <button class="side-nav-btn" onclick="sideGoCW()">🏢 전담기관 대시보드</button>
+  </div>
+</div>
+
+<!-- Phone -->
+<div class="shell">
+  <div class="phone" id="phone">
+    <div class="notch"></div>
+
+    <!-- Status bar -->
+    <div class="sbar dark" id="sbar">
+      <span class="sbar-time">9:41</span>
+      <div class="sbar-icons">
+        <svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor"><rect x="0" y="3" width="3" height="9" rx="1" opacity=".4"/><rect x="4.5" y="2" width="3" height="10" rx="1" opacity=".6"/><rect x="9" y="0" width="3" height="12" rx="1" opacity=".8"/><rect x="13.5" y="0" width="3" height="12" rx="1"/></svg>
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><path d="M8 2.4C10.7 2.4 13.1 3.5 14.8 5.3L16 4C13.9 1.8 11.1.5 8 .5S2.1 1.8 0 4l1.2 1.3C2.9 3.5 5.3 2.4 8 2.4zM8 5.2c1.8 0 3.4.8 4.6 2L14 5.8C12.5 4.2 10.4 3.2 8 3.2S3.5 4.2 2 5.8L3.4 7.2C4.6 6 6.2 5.2 8 5.2zM8 8c1 0 1.9.4 2.6 1L8 12 5.4 9C6.1 8.4 7 8 8 8z"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="currentColor"><rect x="0" y="1" width="22" height="10" rx="3" stroke="currentColor" stroke-width="1" fill="none" opacity=".35"/><rect x="23" y="4" width="2" height="4" rx="1" opacity=".4"/><rect x="1" y="2" width="19" height="8" rx="2"/></svg>
+      </div>
+    </div>
+
+    <!-- Screens -->
+    <div class="screens">
+
+      <!-- ── S1: WELCOME ── -->
+      <div class="screen active" id="s-welcome">
+        <div class="welcome-body">
+          <div class="welcome-logo-area">
+            <div class="logo-main">나와</div>
+            <div class="logo-en">N A W A</div>
+            <div class="logo-tag">받을 수 있는 지원,<br>직접 찾지 않아도 됩니다</div>
+          </div>
+          <div class="feat-cards">
+            <div class="feat-card"><div class="feat-ico">🔍</div><div class="feat-txt">9개 사이트를 뒤지지 않아도<br>내 자격에 맞는 지원이 먼저 와요</div></div>
+            <div class="feat-card"><div class="feat-ico">📋</div><div class="feat-txt">서류 준비부터 신청 완료까지<br>처음부터 끝까지 함께해요</div></div>
+            <div class="feat-card"><div class="feat-ico">🔄</div><div class="feat-txt">이사·휴학·퇴사 후에도<br>바뀐 자격을 자동으로 다시 확인해요</div></div>
+          </div>
+          <div class="welcome-btns">
+            <button class="btn btn-w" onclick="push('s-ob1')">지원 찾아보기</button>
+            <button class="btn" style="background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.35)" onclick="skipToHome()">이미 가입했어요</button>
+          </div>
+          <div class="privacy-note">개인정보는 복지 자격 매칭에만 사용됩니다. 비식별 처리됩니다.</div>
+        </div>
+      </div>
+
+      <!-- ── S2: ONBOARDING 1 — 이름 ── -->
+      <div class="screen" id="s-ob1">
+        <div class="ob-body">
+          <div class="ob-prog">
+            <div class="ob-dot done"></div><div class="ob-dot"></div><div class="ob-dot"></div><div class="ob-dot"></div><div class="ob-dot"></div>
+          </div>
+          <div class="ob-ttl">반갑습니다 👋</div>
+          <div class="ob-sub">이름을 알려주세요<br>닉네임도 괜찮아요</div>
+          <div class="ob-fields">
+            <div class="ob-field">
+              <div class="field-lbl">이름 또는 닉네임</div>
+              <input class="inp" value="이나영" placeholder="예: 이나영" type="text">
+            </div>
+          </div>
+        </div>
+        <div class="ob-footer">
+          <button class="btn btn-ghost" style="flex:1" onclick="pop()">이전</button>
+          <button class="btn btn-p" style="flex:2" onclick="push('s-ob2')">다음</button>
+        </div>
+      </div>
+
+      <!-- ── S3: ONBOARDING 2 — 보호종료 ── -->
+      <div class="screen" id="s-ob2">
+        <div class="ob-body">
+          <div class="ob-prog">
+            <div class="ob-dot done"></div><div class="ob-dot done"></div><div class="ob-dot"></div><div class="ob-dot"></div><div class="ob-dot"></div>
+          </div>
+          <div class="ob-ttl">언제 보호가 종료됐나요?</div>
+          <div class="ob-sub">지원 자격 기준이 되는 날짜예요</div>
+          <div class="ob-fields">
+            <div class="ob-field">
+              <div class="field-lbl">생년월일 (8자리)</div>
+              <input class="inp" value="20030415" placeholder="예: 20030415" type="number">
+            </div>
+            <div class="ob-field">
+              <div class="field-lbl">보호 종료 날짜 (8자리)</div>
+              <input class="inp" value="20241001" placeholder="예: 20241001" type="number">
+            </div>
+            <div class="ob-field">
+              <div class="field-lbl">어디서 보호를 받았나요?</div>
+              <div class="chips-wrap">
+                <button class="chip on" onclick="toggleChip(this,'ptype')">아동양육시설</button>
+                <button class="chip" onclick="toggleChip(this,'ptype')">공동생활가정</button>
+                <button class="chip" onclick="toggleChip(this,'ptype')">가정위탁</button>
+                <button class="chip" onclick="toggleChip(this,'ptype')">청소년쉼터</button>
+                <button class="chip" onclick="toggleChip(this,'ptype')">기타</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="ob-footer">
+          <button class="btn btn-ghost" style="flex:1" onclick="pop()">이전</button>
+          <button class="btn btn-p" style="flex:2" onclick="push('s-ob3')">다음</button>
+        </div>
+      </div>
+
+      <!-- ── S4: ONBOARDING 3 — 지역 ── -->
+      <div class="screen" id="s-ob3">
+        <div class="ob-body">
+          <div class="ob-prog">
+            <div class="ob-dot done"></div><div class="ob-dot done"></div><div class="ob-dot done"></div><div class="ob-dot"></div><div class="ob-dot"></div>
+          </div>
+          <div class="ob-ttl">지금 어디 사세요?</div>
+          <div class="ob-sub">지역마다 받을 수 있는 지원이 달라요</div>
+          <div class="ob-fields">
+            <div class="ob-field">
+              <div class="field-lbl">시 / 도</div>
+              <div class="chips-wrap" id="region-chips">
+                <button class="chip on" onclick="toggleChip(this,'region')">서울</button>
+                <button class="chip" onclick="toggleChip(this,'region')">부산</button>
+                <button class="chip" onclick="toggleChip(this,'region')">대구</button>
+                <button class="chip" onclick="toggleChip(this,'region')">인천</button>
+                <button class="chip" onclick="toggleChip(this,'region')">광주</button>
+                <button class="chip" onclick="toggleChip(this,'region')">대전</button>
+                <button class="chip" onclick="toggleChip(this,'region')">울산</button>
+                <button class="chip" onclick="toggleChip(this,'region')">세종</button>
+                <button class="chip" onclick="toggleChip(this,'region')">경기</button>
+                <button class="chip" onclick="toggleChip(this,'region')">강원</button>
+                <button class="chip" onclick="toggleChip(this,'region')">충북</button>
+                <button class="chip" onclick="toggleChip(this,'region')">충남</button>
+                <button class="chip" onclick="toggleChip(this,'region')">전북</button>
+                <button class="chip" onclick="toggleChip(this,'region')">전남</button>
+                <button class="chip" onclick="toggleChip(this,'region')">경북</button>
+                <button class="chip" onclick="toggleChip(this,'region')">경남</button>
+                <button class="chip" onclick="toggleChip(this,'region')">제주</button>
+              </div>
+            </div>
+            <div class="ob-field">
+              <div class="field-lbl">시 / 군 / 구 (선택)</div>
+              <input class="inp" value="마포구" placeholder="예: 마포구" type="text">
+            </div>
+          </div>
+        </div>
+        <div class="ob-footer">
+          <button class="btn btn-ghost" style="flex:1" onclick="pop()">이전</button>
+          <button class="btn btn-p" style="flex:2" onclick="push('s-ob4')">다음</button>
+        </div>
+      </div>
+
+      <!-- ── S5: ONBOARDING 4 — 현재 상황 ── -->
+      <div class="screen" id="s-ob4">
+        <div class="ob-body">
+          <div class="ob-prog">
+            <div class="ob-dot done"></div><div class="ob-dot done"></div><div class="ob-dot done"></div><div class="ob-dot done"></div><div class="ob-dot"></div>
+          </div>
+          <div class="ob-ttl">지금 어떻게 지내고 있어요?</div>
+          <div class="ob-sub">수급 현황과 생활 상태를 알려주세요</div>
+          <div class="ob-fields">
+            <div class="ob-field">
+              <div class="field-lbl">현재 상황</div>
+              <div class="scard on" id="sc-student" onclick="selectStatus('student')">
+                <div style="font-size:24px">📚</div>
+                <div style="flex:1"><div style="font-size:15px;font-weight:700;color:var(--b1)">재학 중</div><div style="font-size:12.5px;color:var(--b3);margin-top:2px">대학·직업훈련 등 학업 중</div></div>
+                <div class="sit-chk" style="background:var(--g6);border-color:var(--g6);color:#fff">✓</div>
+              </div>
+              <div class="scard" id="sc-employed" onclick="selectStatus('employed')">
+                <div style="font-size:24px">💼</div>
+                <div style="flex:1"><div style="font-size:15px;font-weight:700;color:var(--b1)">일하고 있어요</div><div style="font-size:12.5px;color:var(--b3);margin-top:2px">직장 재직 또는 아르바이트</div></div>
+                <div class="sit-chk">✓</div>
+              </div>
+              <div class="scard" id="sc-job" onclick="selectStatus('job')">
+                <div style="font-size:24px">🔍</div>
+                <div style="flex:1"><div style="font-size:15px;font-weight:700;color:var(--b1)">취업 준비 중</div><div style="font-size:12.5px;color:var(--b3);margin-top:2px">구직활동 또는 준비 기간</div></div>
+                <div class="sit-chk">✓</div>
+              </div>
+              <div class="scard" id="sc-rest" onclick="selectStatus('rest')">
+                <div style="font-size:24px">🌿</div>
+                <div style="flex:1"><div style="font-size:15px;font-weight:700;color:var(--b1)">쉬고 있어요</div><div style="font-size:12.5px;color:var(--b3);margin-top:2px">비경제활동 상태</div></div>
+                <div class="sit-chk">✓</div>
+              </div>
+            </div>
+            <div class="ob-field">
+              <div class="field-lbl">자립수당을 받고 있나요?</div>
+              <div class="chips-wrap">
+                <button class="chip on" onclick="toggleChip(this,'jarip')">받고 있어요</button>
+                <button class="chip" onclick="toggleChip(this,'jarip')">아직 안 받아요</button>
+              </div>
+            </div>
+            <div class="ob-field">
+              <div class="field-lbl">기초생활수급을 받고 있나요?</div>
+              <div class="chips-wrap">
+                <button class="chip" onclick="toggleChip(this,'basic')">네</button>
+                <button class="chip on" onclick="toggleChip(this,'basic')">아니요</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="ob-footer">
+          <button class="btn btn-ghost" style="flex:1" onclick="pop()">이전</button>
+          <button class="btn btn-p" style="flex:2" onclick="push('s-ob5')">다음</button>
+        </div>
+      </div>
+
+      <!-- ── S6: ONBOARDING 5 — 계정 ── -->
+      <div class="screen" id="s-ob5">
+        <div class="ob-body">
+          <div class="ob-prog">
+            <div class="ob-dot done"></div><div class="ob-dot done"></div><div class="ob-dot done"></div><div class="ob-dot done"></div><div class="ob-dot done"></div>
+          </div>
+          <div class="ob-ttl">거의 다 됐어요 🌿</div>
+          <div class="ob-sub">나와 계정을 만들어요</div>
+          <div class="ob-fields">
+            <div class="ob-field">
+              <div class="field-lbl">전화번호</div>
+              <input class="inp" value="010-3892-4571" placeholder="010-0000-0000" type="tel">
+            </div>
+            <div class="ob-field">
+              <div class="field-lbl">비밀번호 (8자 이상)</div>
+              <input class="inp" value="••••••••••" placeholder="비밀번호를 입력하세요" type="password">
+            </div>
+            <div style="background:var(--bg);border-radius:var(--r);padding:14px">
+              <p style="font-size:12px;color:var(--b3);line-height:1.7">
+                가입하면 <strong>개인정보 수집·이용에 동의</strong>하는 것으로 간주됩니다. 수집된 정보는 복지 자격 매칭에만 사용되며, 비식별 처리됩니다. 전담기관에는 앱 비활성 신호만 전달됩니다.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="ob-footer">
+          <button class="btn btn-ghost" style="flex:1" onclick="pop()">이전</button>
+          <button class="btn btn-p" style="flex:2" onclick="startMatching()">지원 찾기 시작 →</button>
+        </div>
+      </div>
+
+      <!-- ── S7: MATCHING ── -->
+      <div class="screen" id="s-matching" style="background:linear-gradient(160deg,#082316 0%,#0F3520 20%,#1A6B4A 55%,#2D9B6F 80%,#4EB880 100%)">
+        <div class="match-body">
+          <div class="match-logo">나와</div>
+          <div class="match-ttl" style="color:#fff">이나영님의 자격을 확인하고 있어요</div>
+          <div class="match-sub">잠깐만 기다려주세요 — 곧 결과가 나와요</div>
+          <div class="match-steps" id="match-steps">
+            <div class="match-step"><div class="mstep-ico">💰</div><div class="mstep-txt">생활비·자립수당 지원 확인 중</div><div class="mstep-chk" id="ms0"></div></div>
+            <div class="match-step"><div class="mstep-ico">🏠</div><div class="mstep-txt">주거 지원 확인 중</div><div class="mstep-chk" id="ms1"></div></div>
+            <div class="match-step"><div class="mstep-ico">📚</div><div class="mstep-txt">장학금·등록금 지원 확인 중</div><div class="mstep-chk" id="ms2"></div></div>
+            <div class="match-step"><div class="mstep-ico">💼</div><div class="mstep-txt">취업·직업훈련 확인 중</div><div class="mstep-chk" id="ms3"></div></div>
+            <div class="match-step"><div class="mstep-ico">🏦</div><div class="mstep-txt">자산형성 프로그램 확인 중</div><div class="mstep-chk" id="ms4"></div></div>
+            <div class="match-step"><div class="mstep-ico">🏥</div><div class="mstep-txt">의료비 지원 확인 중</div><div class="mstep-chk" id="ms5"></div></div>
+          </div>
+          <div class="match-result" id="match-result" style="display:none">
+            <div class="result-num">7</div>
+            <div class="result-lbl">개의 지원을 찾았어요!</div>
+            <div style="font-size:12px;color:rgba(255,255,255,.7);margin-top:8px">마감 임박 2개 포함</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── S8: HOME ── -->
+      <div class="screen" id="s-home">
+        <div class="home-header">
+          <div class="home-greeting">
+            <div class="home-logo">나와</div>
+            <div class="home-sub">받을 수 있는 지원 <strong style="color:var(--g6)">7개</strong>를 찾았어요</div>
+          </div>
+          <button class="refresh-btn" onclick="this.style.transform='rotate(360deg)'">🔄</button>
+        </div>
+
+        <div class="stat-strip">
+          <div class="stat-item"><div class="stat-num">7</div><div class="stat-lbl">받을 수 있는 지원</div></div>
+          <div class="stat-item"><div class="stat-num" style="color:#FFD700">2</div><div class="stat-lbl">마감 임박</div></div>
+          <div class="stat-item"><div class="stat-num" style="color:#4EB880">1</div><div class="stat-lbl">신청 완료</div></div>
+        </div>
+
+        <div class="cat-scroll">
+          <button class="chip on" onclick="toggleCat(this)">전체</button>
+          <button class="chip" onclick="toggleCat(this)">생활비</button>
+          <button class="chip" onclick="toggleCat(this)">주거</button>
+          <button class="chip" onclick="toggleCat(this)">장학금</button>
+          <button class="chip" onclick="toggleCat(this)">취업</button>
+          <button class="chip" onclick="toggleCat(this)">자산</button>
+          <button class="chip" onclick="toggleCat(this)">의료</button>
+        </div>
+
+        <div class="home-content">
+          <!-- 자립수당 종결 배너 -->
+          <div class="jarip-banner">
+            <div class="jb-icon">⚠️</div>
+            <div class="jb-body">
+              <div class="jb-ttl">자립수당 잔여 52개월</div>
+              <div class="jb-sub">종결 예정 시 전환 가능 지원 4건 미리 확인하세요</div>
+            </div>
+            <div class="jb-arr">›</div>
+          </div>
+
+          <!-- 마감 임박 -->
+          <div class="sec-hd"><div class="sec-ttl">🚨 마감 임박</div><div class="sec-cnt">2개</div></div>
+
+          <div class="wcard very-urgent" onclick="push('s-detail')">
+            <div class="cico red">🤝</div>
+            <div class="cbody">
+              <div class="cname">초록우산 생활장학금</div>
+              <div class="cbenefit">연간 최대 400만원</div>
+              <div class="cmeta">
+                <span class="badge badge-red">🔥 D-5</span>
+                <span style="font-size:12px;color:var(--b4)">초록우산어린이재단</span>
+              </div>
+            </div>
+            <button class="cact" onclick="event.stopPropagation();this.textContent='✓';this.classList.add('saved')">＋</button>
+          </div>
+
+          <div class="wcard urgent" onclick="push('s-detail')">
+            <div class="cico">📚</div>
+            <div class="cbody">
+              <div class="cname">국가장학금 I유형</div>
+              <div class="cbenefit">등록금 전액 (최대 연간 700만원)</div>
+              <div class="cmeta">
+                <span class="badge badge-org">⚡ D-12</span>
+                <span style="font-size:12px;color:var(--b4)">한국장학재단</span>
+              </div>
+            </div>
+            <button class="cact saved" onclick="event.stopPropagation()">✓</button>
+          </div>
+
+          <!-- 일반 지원 -->
+          <div class="sec-hd" style="margin-top:6px"><div class="sec-ttl">✅ 받을 수 있는 지원</div><div class="sec-cnt">5개</div></div>
+
+          <div class="wcard" onclick="push('s-detail')">
+            <div class="cico blu">🏠</div>
+            <div class="cbody">
+              <div class="cname">LH 전세임대주택</div>
+              <div class="cbenefit">수도권 최대 1억 3,500만원 한도</div>
+              <div class="cmeta">
+                <span class="badge badge-grn">상시 신청</span>
+                <span style="font-size:12px;color:var(--b4)">한국토지주택공사</span>
+              </div>
+            </div>
+            <button class="cact" onclick="event.stopPropagation();this.textContent='✓';this.classList.add('saved')">＋</button>
+          </div>
+
+          <div class="wcard" onclick="push('s-detail')">
+            <div class="cico yel">🏦</div>
+            <div class="cbody">
+              <div class="cname">청년내일저축계좌</div>
+              <div class="cbenefit">3년 만기 최대 1,440만원</div>
+              <div class="cmeta">
+                <span class="badge badge-yel">신규 공고</span>
+                <span style="font-size:12px;color:var(--b4)">보건복지부</span>
+              </div>
+            </div>
+            <button class="cact" onclick="event.stopPropagation();this.textContent='✓';this.classList.add('saved')">＋</button>
+          </div>
+
+          <div class="wcard" onclick="push('s-detail')">
+            <div class="cico org">🎓</div>
+            <div class="cbody">
+              <div class="cname">아동권리보장원 장학금</div>
+              <div class="cbenefit">연간 50 ~ 200만원</div>
+              <div class="cmeta">
+                <span class="badge badge-org">D-45</span>
+                <span style="font-size:12px;color:var(--b4)">아동권리보장원</span>
+              </div>
+            </div>
+            <button class="cact" onclick="event.stopPropagation();this.textContent='✓';this.classList.add('saved')">＋</button>
+          </div>
+
+          <div class="wcard" onclick="push('s-detail')">
+            <div class="cico" style="background:#F5F3FF">🏥</div>
+            <div class="cbody">
+              <div class="cname">자립준비청년 의료비 지원</div>
+              <div class="cbenefit">입원 최대 100만원, 외래 30만원</div>
+              <div class="cmeta">
+                <span class="badge badge-grn">상시 신청</span>
+                <span style="font-size:12px;color:var(--b4)">보건복지부</span>
+              </div>
+            </div>
+            <button class="cact" onclick="event.stopPropagation();this.textContent='✓';this.classList.add('saved')">＋</button>
+          </div>
+
+          <div class="disc"><p>⚠️ AI 기반 자격 판단 결과입니다. 최종 확인은 거주지 자립지원전담기관에서 받으세요. (자립정보ON: jaripjungbo.or.kr)</p></div>
+
+          <div style="margin-top:16px;padding:14px;background:#fff;border-radius:var(--r);text-align:center;cursor:pointer;box-shadow:var(--sh)" onclick="sideGoCW()">
+            <div style="font-size:13px;font-weight:600;color:var(--b3)">🏢 전담인력·기관 담당자이신가요?</div>
+            <div style="font-size:12px;color:var(--b4);margin-top:3px">전담기관 대시보드 보기 →</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── S9: DETAIL ── -->
+      <div class="screen" id="s-detail" style="background:#fff">
+        <div class="detail-hero">
+          <button class="detail-close" onclick="pop()">✕</button>
+          <div class="detail-source">한국장학재단 (KOSAF)</div>
+          <div class="detail-title">국가장학금 I유형</div>
+          <div class="detail-op">자립준비청년 우선 지원 — 소득분위 무관</div>
+        </div>
+
+        <div class="urgent-bar">
+          <span style="font-size:20px">⚡</span>
+          <span class="ub-txt">신청 마감 D-12 — 2026년 2월 21일까지</span>
+        </div>
+
+        <div class="detail-body">
+          <div class="detail-sec">
+            <div class="detail-sec-ttl">💰 지원 내용</div>
+            <div class="detail-card">
+              <div class="info-row"><span class="info-lbl">지원 금액</span><span class="info-val">등록금 전액<br>(최대 연간 700만원)</span></div>
+              <div style="height:1px;background:var(--bdr)"></div>
+              <div class="info-row"><span class="info-lbl">지원 기간</span><span class="info-val">재학 기간 전체</span></div>
+              <div style="height:1px;background:var(--bdr)"></div>
+              <div class="info-row"><span class="info-lbl">신청 마감</span><span class="info-val" style="color:var(--red);font-weight:800">2026년 2월 21일</span></div>
+            </div>
+          </div>
+
+          <div class="detail-sec">
+            <div class="detail-sec-ttl">✅ 자격 조건</div>
+            <div class="detail-card">
+              <div class="bull-row"><div class="bull">•</div><div class="bull-txt">국내 대학 재학(또는 입학 예정)자</div></div>
+              <div class="bull-row"><div class="bull">•</div><div class="bull-txt">보호종료아동 (아동복지법에 의한 보호 종료)</div></div>
+              <div class="bull-row"><div class="bull">•</div><div class="bull-txt">청소년쉼터 퇴소 청년도 별도 지원 대상 확인 가능</div></div>
+              <div class="bull-row"><div class="bull" style="color:var(--g5)">★</div><div class="bull-txt" style="color:var(--g7);font-weight:600">소득분위 제한 없음 — 자립준비청년 우선 지원</div></div>
+            </div>
+          </div>
+
+          <div class="detail-sec">
+            <div class="detail-sec-ttl">📋 필요 서류</div>
+            <div class="detail-card" style="padding:8px 16px">
+              <div class="doc-row">
+                <div style="font-size:20px">📄</div>
+                <div><div class="doc-name">보호종료확인서</div><div class="doc-guide">보호종료 시설에 요청 → 우편 또는 방문 수령</div></div>
+              </div>
+              <div class="doc-row">
+                <div style="font-size:20px">🎓</div>
+                <div><div class="doc-name">재학증명서</div><div class="doc-guide">학교 학생포털에서 온라인 발급 (무료)</div></div>
+              </div>
+              <div class="doc-row">
+                <div style="font-size:20px">🏠</div>
+                <div><div class="doc-name">주민등록등본</div><div class="doc-guide">정부24(gov.kr)에서 무료 발급 또는 주민센터</div></div>
+              </div>
+            </div>
+          </div>
+
+          <div style="background:var(--yel-bg);border-radius:var(--r);padding:14px;border:1px solid rgba(217,119,6,.15)">
+            <div style="font-size:13px;font-weight:700;color:#92400E;margin-bottom:5px">⚠️ 최종 확인 필요</div>
+            <p style="font-size:12px;color:#78350F;line-height:1.65">자격 조건은 매년 변경될 수 있습니다. 신청 전 한국장학재단(☎ 1599-2000)에 확인하거나 거주지 자립지원전담기관에 문의하세요.</p>
+          </div>
+        </div>
+
+        <div class="detail-footer">
+          <button class="btn btn-o btn-sm" onclick="alert('한국장학재단 신청 페이지로 이동합니다.\n(데모에서는 실제 이동 없음)')">🔗 신청 페이지 바로가기</button>
+          <button class="btn btn-p" onclick="showAppStart()">신청 준비 시작 →</button>
+        </div>
+      </div>
+
+      <!-- ── S10: APPLICATIONS ── -->
+      <div class="screen" id="s-apps">
+        <div class="app-header">
+          <div class="app-title">신청 관리</div>
+          <div class="app-sub">1개 신청 완료 · 1개 준비 중</div>
+        </div>
+
+        <div class="app-content">
+          <!-- 초록우산: 신청 완료 -->
+          <div class="app-submitted">
+            <div class="submit-icon">🎉</div>
+            <div>
+              <div class="submit-ttl">초록우산 생활장학금 신청 완료</div>
+              <div class="submit-date">2026년 1월 28일 제출 · 심사 중</div>
+            </div>
+          </div>
+
+          <!-- 국가장학금: 서류 준비 중 -->
+          <div class="app-card">
+            <div class="app-card-hd" onclick="toggleAppCard(this)">
+              <div style="font-size:24px">📚</div>
+              <div style="flex:1">
+                <div style="font-size:15px;font-weight:700;color:var(--b1)">국가장학금 I유형</div>
+                <div style="margin-top:5px"><span class="badge badge-yel">서류 준비 중</span></div>
+              </div>
+              <div style="font-size:20px;color:var(--b4);transition:transform .3s" id="app-arr">›</div>
+            </div>
+            <div class="app-prog-wrap">
+              <div class="pbar" style="flex:1"><div class="pfill" style="width:80%"></div></div>
+              <div class="app-prog-lbl">4/5</div>
+            </div>
+            <div class="app-card-body" id="app-body" style="display:none">
+              <div class="app-sec-ttl">📋 서류 체크리스트</div>
+              <div class="checklist">
+                <div class="chk-item">
+                  <div class="cbox chk" onclick="toggleCbox(this)">✓</div>
+                  <div><div style="font-size:14px;font-weight:600;color:var(--b3);text-decoration:line-through">보호종료확인서</div><div style="font-size:12px;color:var(--b4);margin-top:2px">시설에서 수령 완료</div></div>
+                </div>
+                <div class="chk-item">
+                  <div class="cbox chk" onclick="toggleCbox(this)">✓</div>
+                  <div><div style="font-size:14px;font-weight:600;color:var(--b3);text-decoration:line-through">재학증명서</div><div style="font-size:12px;color:var(--b4);margin-top:2px">학생포털 발급 완료</div></div>
+                </div>
+                <div class="chk-item">
+                  <div class="cbox chk" onclick="toggleCbox(this)">✓</div>
+                  <div><div style="font-size:14px;font-weight:600;color:var(--b3);text-decoration:line-through">주민등록등본</div><div style="font-size:12px;color:var(--b4);margin-top:2px">정부24 발급 완료</div></div>
+                </div>
+                <div class="chk-item">
+                  <div class="cbox chk" onclick="toggleCbox(this)">✓</div>
+                  <div><div style="font-size:14px;font-weight:600;color:var(--b3);text-decoration:line-through">신분증 사본</div><div style="font-size:12px;color:var(--b4);margin-top:2px">촬영 완료</div></div>
+                </div>
+                <div class="chk-item">
+                  <div class="cbox" onclick="toggleCbox(this)">✓</div>
+                  <div>
+                    <div style="font-size:14px;font-weight:600;color:var(--b1)">통장 사본</div>
+                    <div style="font-size:12px;color:var(--b4);margin-top:2px">은행 앱에서 첫 페이지 촬영 후 업로드</div>
+                  </div>
+                </div>
+              </div>
+              <button class="ai-btn" onclick="showAIDraft()">✨ AI 신청서 초안 생성</button>
+              <button class="apply-btn" onclick="alert('한국장학재단 신청 페이지로 이동합니다.')">🔗 신청 페이지 바로가기</button>
+              <button class="done-btn" onclick="markSubmitted(this)">✅ 신청 완료했어요</button>
+            </div>
+          </div>
+
+          <!-- LH: 저장됨 -->
+          <div class="app-card">
+            <div class="app-card-hd" onclick="toggleAppCard2(this)">
+              <div style="font-size:24px">🏠</div>
+              <div style="flex:1">
+                <div style="font-size:15px;font-weight:700;color:var(--b1)">LH 전세임대주택</div>
+                <div style="margin-top:5px"><span class="badge badge-gry">저장됨</span></div>
+              </div>
+              <div style="font-size:20px;color:var(--b4)">›</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── S11: SITUATION ── -->
+      <div class="screen" id="s-sit">
+        <div class="sit-header">
+          <div class="sit-title">상황 업데이트</div>
+          <div class="sit-sub">바뀐 것이 있으면 알려주세요.<br>맞는 지원을 다시 찾아드려요.</div>
+        </div>
+        <div class="sit-content">
+          <div class="sit-card" id="sit-moved" onclick="toggleSit(this,'moved')">
+            <div class="sit-ico">📦</div>
+            <div class="sit-body"><div class="sit-ttl">이사했어요</div><div class="sit-desc">거주 지역이 바뀌었어요</div></div>
+            <div class="sit-chk">✓</div>
+          </div>
+          <div class="sit-sub-expand" id="sit-moved-exp" style="display:none">
+            <div class="sit-sub-lbl">새 거주지 시/도</div>
+            <div class="sit-chips">
+              <button class="chip" onclick="toggleChip(this,'new-region')">경기</button>
+              <button class="chip" onclick="toggleChip(this,'new-region')">인천</button>
+              <button class="chip" onclick="toggleChip(this,'new-region')">부산</button>
+              <button class="chip" onclick="toggleChip(this,'new-region')">대전</button>
+              <button class="chip" onclick="toggleChip(this,'new-region')">기타</button>
+            </div>
+          </div>
+
+          <div class="sit-card" id="sit-school" onclick="toggleSit(this,'school')">
+            <div class="sit-ico">🎓</div>
+            <div class="sit-body"><div class="sit-ttl">학적이 변경됐어요</div><div class="sit-desc">휴학·복학·졸업·입학</div></div>
+            <div class="sit-chk">✓</div>
+          </div>
+          <div class="sit-sub-expand" id="sit-school-exp" style="display:none">
+            <div class="sit-sub-lbl">현재 상태</div>
+            <div class="sit-chips">
+              <button class="chip" onclick="toggleChip(this,'school-status')">재학 중 / 복학</button>
+              <button class="chip" onclick="toggleChip(this,'school-status')">휴학 / 졸업</button>
+            </div>
+          </div>
+
+          <div class="sit-card" id="sit-job" onclick="toggleSit(this,'job')">
+            <div class="sit-ico">💼</div>
+            <div class="sit-body"><div class="sit-ttl">취업 상황이 달라졌어요</div><div class="sit-desc">취업·퇴사·구직 시작</div></div>
+            <div class="sit-chk">✓</div>
+          </div>
+
+          <div class="sit-card" id="sit-jarip" onclick="toggleSit(this,'jarip')">
+            <div class="sit-ico">📅</div>
+            <div class="sit-body"><div class="sit-ttl">자립수당이 종결됐어요</div><div class="sit-desc">60개월 만료 또는 중도 종결</div></div>
+            <div class="sit-chk">✓</div>
+          </div>
+
+          <div class="sit-card" id="sit-basic" onclick="toggleSit(this,'basic')">
+            <div class="sit-ico">🛡️</div>
+            <div class="sit-body"><div class="sit-ttl">기초생활수급 자격이 달라졌어요</div><div class="sit-desc">수급 신청·취소·변동</div></div>
+            <div class="sit-chk">✓</div>
+          </div>
+
+          <div class="sit-card" id="sit-income" onclick="toggleSit(this,'income')">
+            <div class="sit-ico">💰</div>
+            <div class="sit-body"><div class="sit-ttl">소득이 크게 달라졌어요</div><div class="sit-desc">월 소득 변동 50만원 이상</div></div>
+            <div class="sit-chk">✓</div>
+          </div>
+
+          <div class="sit-submit">
+            <button class="btn btn-p" id="sit-btn" onclick="submitSituation()" disabled style="opacity:.45">지원 다시 찾기</button>
+          </div>
+          <div class="no-change">바뀐 것이 없어요? 현재 자격 그대로 유지됩니다.</div>
+        </div>
+
+        <!-- 성공 오버레이 -->
+        <div class="success-overlay" id="sit-success">
+          <div class="success-card">
+            <div class="success-ico">🌿</div>
+            <div class="success-ttl">업데이트 완료!</div>
+            <div class="success-sub">바뀐 상황에 맞는 지원을 다시 찾아봤어요. 경기도 청년 기본소득 등 <strong>2개의 새 지원</strong>이 추가됐어요!</div>
+            <button class="btn btn-p" onclick="closeSuccess()">홈에서 확인하기</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── S12: FEEDBACK ── -->
+      <div class="screen" id="s-fb">
+        <div class="fb-header">
+          <div class="fb-title">자립준비청년이<br>제안합니다</div>
+          <div class="fb-sub">당신의 경험이 제도를 바꿀 수 있어요.<br>의견은 분기별 보고서로 아동권리보장원에 전달됩니다.</div>
+        </div>
+        <div class="fb-content">
+          <div>
+            <div class="fb-sec-lbl" style="margin-bottom:10px">어떤 내용인가요?</div>
+            <div class="fb-cats">
+              <div class="fb-cat on" onclick="toggleFbCat(this)">
+                <div class="fb-cat-ico">📢</div>
+                <div class="fb-cat-ttl">제도개선</div>
+                <div class="fb-cat-desc">이렇게 바뀌면 좋겠어요</div>
+              </div>
+              <div class="fb-cat" onclick="toggleFbCat(this)">
+                <div class="fb-cat-ico">🔧</div>
+                <div class="fb-cat-ttl">서비스불편</div>
+                <div class="fb-cat-desc">앱 사용 중 불편한 점</div>
+              </div>
+              <div class="fb-cat" onclick="toggleFbCat(this)">
+                <div class="fb-cat-ico">💡</div>
+                <div class="fb-cat-ttl">새지원제안</div>
+                <div class="fb-cat-desc">없는 지원 정보 추가 요청</div>
+              </div>
+              <div class="fb-cat" onclick="toggleFbCat(this)">
+                <div class="fb-cat-ico">💬</div>
+                <div class="fb-cat-ttl">기타</div>
+                <div class="fb-cat-desc">하고 싶은 말</div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="fb-sec-lbl" style="margin-bottom:10px">내용을 입력해주세요</div>
+            <textarea class="fb-textarea" id="fb-text" placeholder="자유롭게 적어주세요. 최소 10자 이상" oninput="updateFbChar(this)"></textarea>
+            <div class="fb-char" id="fb-char">0자</div>
+          </div>
+
+          <div class="anon-row">
+            <div>
+              <div class="anon-lbl">익명으로 제출</div>
+              <div class="anon-sub">이름 없이 내용만 전달됩니다</div>
+            </div>
+            <label class="toggle-wrap">
+              <input type="checkbox" class="toggle-input" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+
+          <button class="btn btn-p" onclick="submitFeedback()">제안 전달하기</button>
+        </div>
+      </div>
+
+      <!-- ── S13: CASE WORKER DASHBOARD ── -->
+      <div class="screen" id="s-cw">
+        <div class="cw-header">
+          <div class="cw-badge">🏢 전담기관 관리 화면</div>
+          <div class="cw-ttl">서울 서부 자립지원전담기관</div>
+          <div class="cw-sub">담당 청년 43명 · 2026년 6월 기준</div>
+        </div>
+
+        <div style="padding:16px 20px 0">
+          <button class="back-btn" onclick="tabs_go('s-home')">← 청년 화면으로 돌아가기</button>
+        </div>
+
+        <div class="cw-stats">
+          <div class="cw-stat"><div class="cw-stat-num">43</div><div class="cw-stat-lbl">담당 청년 수</div></div>
+          <div class="cw-stat warn"><div class="cw-stat-num">3</div><div class="cw-stat-lbl">연락 단절 위험 🔴</div></div>
+          <div class="cw-stat warn"><div class="cw-stat-num">5</div><div class="cw-stat-lbl">마감 임박 미신청</div></div>
+          <div class="cw-stat grn"><div class="cw-stat-num">28</div><div class="cw-stat-lbl">이번 달 신청 완료</div></div>
+        </div>
+
+        <div class="cw-sec">
+          <div class="cw-sec-ttl">🔴 연락 확인이 필요한 청년</div>
+          <div class="cw-youth-card">
+            <div class="cw-avatar" style="background:linear-gradient(135deg,#EF4444,#DC2626)">김</div>
+            <div style="flex:1"><div class="cw-youth-name">김○○ (21세)</div><div class="cw-youth-sub">서울 은평구 · 19일째 미접속</div></div>
+            <div class="cw-risk-badge">19일 미접속</div>
+          </div>
+          <div class="cw-youth-card">
+            <div class="cw-avatar" style="background:linear-gradient(135deg,#F97316,#EA580C)">박</div>
+            <div style="flex:1"><div class="cw-youth-name">박○○ (22세)</div><div class="cw-youth-sub">서울 노원구 · 16일째 미접속</div></div>
+            <div class="cw-risk-badge">16일 미접속</div>
+          </div>
+          <div class="cw-youth-card">
+            <div class="cw-avatar" style="background:linear-gradient(135deg,#EAB308,#CA8A04)">최</div>
+            <div style="flex:1"><div class="cw-youth-name">최○○ (23세)</div><div class="cw-youth-sub">서울 마포구 · 14일째 미접속</div></div>
+            <div class="cw-risk-badge">14일 미접속</div>
+          </div>
+        </div>
+
+        <div class="cw-sec">
+          <div class="cw-sec-ttl">⏰ 마감 임박 미신청 현황</div>
+          <div class="cw-missed">
+            <div class="cw-missed-item">
+              <div class="cw-missed-num">7명</div>
+              <div><div class="cw-missed-name">국가장학금 I유형</div><div class="cw-missed-cat">D-12 · 한국장학재단</div></div>
+            </div>
+            <div class="cw-missed-item">
+              <div class="cw-missed-num">12명</div>
+              <div><div class="cw-missed-name">청년내일저축계좌</div><div class="cw-missed-cat">D-18 · 보건복지부</div></div>
+            </div>
+            <div class="cw-missed-item">
+              <div class="cw-missed-num">4명</div>
+              <div><div class="cw-missed-name">서울시 주거비 지원</div><div class="cw-missed-cat">D-28 · 서울시</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="cw-sec">
+          <div class="cw-sec-ttl">📊 가장 많이 놓치는 지원</div>
+          <div class="cw-missed">
+            <div class="cw-missed-item">
+              <div class="cw-missed-num" style="color:var(--b2)">18명</div>
+              <div><div class="cw-missed-name">LH 전세임대주택</div><div class="cw-missed-cat">주거 · 상시 신청</div></div>
+            </div>
+            <div class="cw-missed-item">
+              <div class="cw-missed-num" style="color:var(--b2)">15명</div>
+              <div><div class="cw-missed-name">청년내일저축계좌</div><div class="cw-missed-cat">자산형성</div></div>
+            </div>
+            <div class="cw-missed-item">
+              <div class="cw-missed-num" style="color:var(--b2)">11명</div>
+              <div><div class="cw-missed-name">국가장학금 I유형</div><div class="cw-missed-cat">장학금 · 재학자</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="padding:0 20px 40px">
+          <div style="background:var(--g0);border-radius:var(--r);padding:16px;border:1px solid rgba(45,155,111,.15)">
+            <div style="font-size:14px;font-weight:700;color:var(--g7);margin-bottom:8px">💚 이달 성과</div>
+            <p style="font-size:13px;color:var(--b2);line-height:1.65">담당 청년 28명이 이번 달 지원 신청을 완료했어요. 전달 대비 <strong style="color:var(--g6)">+6명</strong> 증가했습니다.</p>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /screens -->
+
+    <!-- Tab bar -->
+    <div class="tabs" id="tabs">
+      <div class="tab on" id="tab-home" onclick="tabs_go('s-home')">
+        <div class="tab-ico">🔍</div>
+        <div class="tab-lbl">지원 찾기</div>
+      </div>
+      <div class="tab" id="tab-apps" onclick="tabs_go('s-apps')">
+        <div class="tab-ico">✅</div>
+        <div class="tab-lbl">신청 관리</div>
+      </div>
+      <div class="tab" id="tab-sit" onclick="tabs_go('s-sit')">
+        <div class="tab-ico">🔄</div>
+        <div class="tab-lbl">상황 업데이트</div>
+      </div>
+      <div class="tab" id="tab-fb" onclick="tabs_go('s-fb')">
+        <div class="tab-ico">💬</div>
+        <div class="tab-lbl">제안하기</div>
+      </div>
+    </div>
+
+    <!-- AI draft overlay -->
+    <div class="ai-overlay" id="ai-overlay" onclick="hideAI(event)">
+      <div class="ai-sheet" onclick="event.stopPropagation()">
+        <div class="ai-sheet-hd">
+          <div class="ai-sheet-ttl">✨ AI 신청서 초안</div>
+          <button class="ai-close" onclick="hideAI()">✕</button>
+        </div>
+        <div class="ai-disc"><p>⚠️ AI가 생성한 초안입니다. 반드시 내용을 확인하고 수정하세요. 최종 확인은 자립지원전담기관에서 받으세요.</p></div>
+        <div class="ai-content">안녕하세요. 저는 이나영이라고 합니다.
+
+저는 2024년 10월 아동양육시설에서 보호가 종료된 후 현재 대학에 재학 중입니다. 보호종료 이후 자립을 위해 노력하고 있으며, 등록금 부담으로 경제적 어려움을 겪고 있습니다.
+
+국가장학금을 통해 학업에 전념할 수 있는 기회를 얻는다면, 학업을 성실히 이수하여 빠른 시일 내에 안정적으로 자립할 수 있도록 최선을 다하겠습니다.
+
+[본인의 구체적인 자립 계획과 학업 목표를 추가하세요]
+
+감사합니다.
+이나영 드림</div>
+      </div>
+    </div>
+
+  </div><!-- /phone -->
+</div><!-- /shell -->
+
+<script>
+// ── Navigation ──
+const stack = [];
+const TAB_SCREENS = ['s-home','s-apps','s-sit','s-fb'];
+
+function push(id) {
+  const cur = stack[stack.length - 1];
+  if (cur) {
+    document.getElementById(cur).classList.remove('active');
+    document.getElementById(cur).classList.add('behind');
+  }
+  const next = document.getElementById(id);
+  next.classList.remove('behind');
+  next.classList.add('active');
+  stack.push(id);
+  updateUI(id);
+}
+
+function pop() {
+  if (stack.length <= 1) return;
+  const cur = stack.pop();
+  document.getElementById(cur).classList.remove('active');
+  const prev = stack[stack.length - 1];
+  document.getElementById(prev).classList.remove('behind');
+  document.getElementById(prev).classList.add('active');
+  updateUI(prev);
+}
+
+function goScreen(id) {
+  stack.forEach(s => {
+    document.getElementById(s).classList.remove('active','behind');
+  });
+  stack.length = 0;
+  stack.push(id);
+  document.getElementById(id).classList.add('active');
+  updateUI(id);
+}
+
+function tabs_go(id) {
+  TAB_SCREENS.forEach(s => {
+    document.getElementById(s).classList.remove('active','behind');
+  });
+  // keep non-tab history
+  const filtered = stack.filter(s => !TAB_SCREENS.includes(s));
+  stack.length = 0;
+  filtered.forEach(s => stack.push(s));
+  stack.push(id);
+  document.getElementById(id).classList.add('active');
+  updateUI(id);
+  updateSideNav(id);
+}
+
+function updateUI(id) {
+  const sbar = document.getElementById('sbar');
+  const tabs = document.getElementById('tabs');
+  const darkBg = ['s-welcome','s-matching','s-cw'];
+  const tabScreens = TAB_SCREENS;
+
+  sbar.className = darkBg.includes(id) || id === 's-detail' ? 'sbar dark' : 'sbar light';
+  if(id === 's-detail') sbar.style.display = 'none';
+  else sbar.style.display = '';
+
+  tabs.className = tabScreens.includes(id) ? 'tabs show' : 'tabs';
+
+  // update active tab
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+  const tabMap = {'s-home':'tab-home','s-apps':'tab-apps','s-sit':'tab-sit','s-fb':'tab-fb'};
+  if(tabMap[id]) document.getElementById(tabMap[id]).classList.add('on');
+}
+
+// Side nav shortcuts
+function sideGo(id) {
+  goScreen(id);
+  updateSideNav(id);
+}
+
+function sideGoTab(id) {
+  goScreen(id);
+  const tabs = document.getElementById('tabs');
+  tabs.className = 'tabs show';
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+  const tabMap = {'s-home':'tab-home','s-apps':'tab-apps','s-sit':'tab-sit','s-fb':'tab-fb'};
+  if(tabMap[id]) document.getElementById(tabMap[id]).classList.add('on');
+  const sbar = document.getElementById('sbar');
+  sbar.style.display = '';
+  sbar.className = 'sbar light';
+  updateSideNav(id);
+}
+
+function sideGoDetail() {
+  goScreen('s-home');
+  const tabs = document.getElementById('tabs');
+  tabs.className = 'tabs show';
+  document.getElementById('tab-home').classList.add('on');
+  setTimeout(() => push('s-detail'), 50);
+  updateSideNav('s-detail');
+}
+
+function sideGoCW() {
+  goScreen('s-cw');
+  const tabs = document.getElementById('tabs');
+  tabs.className = 'tabs';
+  const sbar = document.getElementById('sbar');
+  sbar.style.display = '';
+  sbar.className = 'sbar dark';
+  updateSideNav('s-cw');
+}
+
+function updateSideNav(id) {
+  document.querySelectorAll('.side-nav-btn').forEach(b => b.classList.remove('active-nav'));
+  const map = {
+    's-welcome':0,'s-ob1':1,'s-matching':2,'s-home':3,'s-detail':4,
+    's-apps':5,'s-sit':6,'s-fb':7,'s-cw':8
+  };
+  const btns = document.querySelectorAll('.side-nav-btn');
+  if(map[id] !== undefined) btns[map[id]]?.classList.add('active-nav');
+}
+
+// ── Onboarding ──
+function toggleChip(el, group) {
+  if(group) {
+    document.querySelectorAll(`[onclick*="${group}"]`).forEach(c => c.classList.remove('on'));
+  }
+  el.classList.toggle('on');
+}
+
+function toggleCat(el) {
+  document.querySelectorAll('.cat-scroll .chip').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+}
+
+function selectStatus(s) {
+  ['student','employed','job','rest'].forEach(k => {
+    const el = document.getElementById(`sc-${k}`);
+    el.classList.remove('on');
+    el.querySelector('.sit-chk').style.cssText = '';
+  });
+  const sel = document.getElementById(`sc-${s}`);
+  sel.classList.add('on');
+  const chk = sel.querySelector('.sit-chk');
+  chk.style.background = 'var(--g6)';
+  chk.style.borderColor = 'var(--g6)';
+  chk.style.color = '#fff';
+}
+
+// ── Matching ──
+function startMatching() {
+  push('s-matching');
+  let i = 0;
+  const steps = ['ms0','ms1','ms2','ms3','ms4','ms5'];
+  const iv = setInterval(() => {
+    if(i < steps.length) {
+      document.getElementById(steps[i]).textContent = '✓';
+      i++;
+    } else {
+      clearInterval(iv);
+      setTimeout(() => {
+        document.getElementById('match-result').style.display = 'block';
+        setTimeout(() => {
+          goScreen('s-home');
+          const tabs = document.getElementById('tabs');
+          tabs.className = 'tabs show';
+          document.getElementById('tab-home').classList.add('on');
+          document.getElementById('sbar').className = 'sbar light';
+          document.getElementById('sbar').style.display = '';
+          updateSideNav('s-home');
+        }, 1800);
+      }, 400);
+    }
+  }, 420);
+}
+
+function skipToHome() {
+  // Reset match steps for re-entry
+  ['ms0','ms1','ms2','ms3','ms4','ms5'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.textContent = '';
+  });
+  document.getElementById('match-result').style.display = 'none';
+  goScreen('s-home');
+  const tabs = document.getElementById('tabs');
+  tabs.className = 'tabs show';
+  document.getElementById('tab-home').classList.add('on');
+  document.getElementById('sbar').className = 'sbar light';
+  document.getElementById('sbar').style.display = '';
+  updateSideNav('s-home');
+}
+
+// ── Apps ──
+function toggleAppCard(hd) {
+  const body = document.getElementById('app-body');
+  const arr = document.getElementById('app-arr');
+  const open = body.style.display !== 'none';
+  body.style.display = open ? 'none' : 'block';
+  arr.style.transform = open ? '' : 'rotate(90deg)';
+}
+
+function toggleAppCard2(hd) {
+  // Simple expand for LH card
+  const card = hd.parentElement;
+  let body = card.querySelector('.app-card-body');
+  if(!body) {
+    body = document.createElement('div');
+    body.className = 'app-card-body';
+    body.innerHTML = `<div style="padding:16px;text-align:center;color:var(--b3);font-size:14px">
+      <div style="font-size:32px;margin-bottom:8px">🏠</div>
+      서류 체크리스트를 시작하려면 '신청 준비 시작'을 눌러주세요.
+      <button class="btn btn-p btn-sm" style="margin-top:12px" onclick="alert('신청 준비 시작!')">신청 준비 시작</button>
+    </div>`;
+    card.appendChild(body);
+  } else {
+    body.style.display = body.style.display === 'none' ? 'block' : 'none';
+  }
+  hd.querySelector(':last-child').style.transform =
+    body.style.display === 'none' ? '' : 'rotate(90deg)';
+}
+
+function toggleCbox(el) {
+  el.classList.toggle('chk');
+  const txt = el.nextElementSibling.querySelector('div');
+  if(el.classList.contains('chk')) {
+    txt.style.textDecoration = 'line-through';
+    txt.style.color = 'var(--b4)';
+    el.textContent = '✓';
+  } else {
+    txt.style.textDecoration = '';
+    txt.style.color = 'var(--b1)';
+    el.textContent = '';
+  }
+}
+
+function markSubmitted(btn) {
+  const card = btn.closest('.app-card');
+  card.innerHTML = `
+    <div style="padding:14px 16px;display:flex;align-items:center;gap:12px">
+      <div style="font-size:28px;animation:float 2s ease-in-out infinite">🎉</div>
+      <div>
+        <div style="font-size:15px;font-weight:700;color:var(--g7)">국가장학금 신청 완료!</div>
+        <div style="font-size:12px;color:var(--b3);margin-top:3px">방금 제출됨 · 심사까지 약 4주 소요</div>
+      </div>
+    </div>`;
+}
+
+function showAIDraft() {
+  document.getElementById('ai-overlay').classList.add('show');
+}
+
+function hideAI(e) {
+  if(!e || e.target === document.getElementById('ai-overlay')) {
+    document.getElementById('ai-overlay').classList.remove('show');
+  }
+}
+
+function showAppStart() {
+  pop();
+  tabs_go('s-apps');
+  setTimeout(() => toggleAppCard(null), 300);
+}
+
+// ── Situation ──
+const pickedSits = new Set();
+
+function toggleSit(card, key) {
+  card.classList.toggle('picked');
+  const chk = card.querySelector('.sit-chk');
+  if(card.classList.contains('picked')) {
+    chk.style.background = 'var(--g6)';
+    chk.style.borderColor = 'var(--g6)';
+    chk.style.color = '#fff';
+    pickedSits.add(key);
+    const exp = document.getElementById(`sit-${key}-exp`);
+    if(exp) exp.style.display = 'flex';
+  } else {
+    chk.style.cssText = '';
+    pickedSits.delete(key);
+    const exp = document.getElementById(`sit-${key}-exp`);
+    if(exp) exp.style.display = 'none';
+  }
+  const btn = document.getElementById('sit-btn');
+  if(pickedSits.size > 0) {
+    btn.disabled = false;
+    btn.style.opacity = '1';
+  } else {
+    btn.disabled = true;
+    btn.style.opacity = '.45';
+  }
+}
+
+function submitSituation() {
+  document.getElementById('sit-success').classList.add('show');
+}
+
+function closeSuccess() {
+  document.getElementById('sit-success').classList.remove('show');
+  pickedSits.clear();
+  document.querySelectorAll('.sit-card').forEach(c => {
+    c.classList.remove('picked');
+    const chk = c.querySelector('.sit-chk');
+    chk.style.cssText = '';
+  });
+  document.querySelectorAll('[id$="-exp"]').forEach(e => e.style.display = 'none');
+  document.getElementById('sit-btn').disabled = true;
+  document.getElementById('sit-btn').style.opacity = '.45';
+  tabs_go('s-home');
+}
+
+// ── Feedback ──
+function toggleFbCat(el) {
+  document.querySelectorAll('.fb-cat').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+}
+
+function updateFbChar(el) {
+  document.getElementById('fb-char').textContent = el.value.length + '자';
+}
+
+function submitFeedback() {
+  const text = document.getElementById('fb-text').value;
+  if(text.length < 10) {
+    alert('내용을 10자 이상 입력해주세요');
+    return;
+  }
+  const phone = document.getElementById('phone');
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:absolute;inset:0;background:rgba(0,0,0,.5);z-index:300;display:flex;align-items:center;justify-content:center';
+  overlay.innerHTML = `<div style="background:#fff;border-radius:24px;padding:32px;text-align:center;width:290px;animation:popIn .3s ease">
+    <div style="font-size:52px;margin-bottom:14px;animation:float 2s infinite">💚</div>
+    <div style="font-size:18px;font-weight:800;color:var(--b1);margin-bottom:8px">제안 접수 완료</div>
+    <div style="font-size:13.5px;color:var(--b3);line-height:1.6;margin-bottom:20px">소중한 의견 감사합니다.<br>아동권리보장원 분기 보고서에<br>반영됩니다.</div>
+    <button class="btn btn-p btn-sm" onclick="this.closest('[style]').remove();document.getElementById('fb-text').value='';document.getElementById('fb-char').textContent='0자'">확인</button>
+  </div>`;
+  phone.appendChild(overlay);
+}
+
+// ── Clock ──
+function updateTime() {
+  const now = new Date();
+  const h = now.getHours().toString().padStart(2,'0');
+  const m = now.getMinutes().toString().padStart(2,'0');
+  document.querySelector('.sbar-time').textContent = `${h}:${m}`;
+}
+updateTime();
+setInterval(updateTime, 30000);
+
+// Init
+updateSideNav('s-welcome');
+</script>
+</body>
+</html>

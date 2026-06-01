@@ -1,0 +1,43 @@
+{
+  "expo": {
+    "name": "나와 (NAWA)",
+    "slug": "nawa",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#1A6B4A"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "app.nawa.youth",
+      "infoPlist": {
+        "NSUserNotificationsUsageDescription": "지원 마감 알림과 자립수당 종결 예정 알림을 보내드려요."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#1A6B4A"
+      },
+      "package": "app.nawa.youth",
+      "permissions": ["RECEIVE_BOOT_COMPLETED", "VIBRATE"]
+    },
+    "plugins": [
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#2D9B6F",
+          "sounds": []
+        }
+      ]
+    ],
+    "extra": {
+      "apiUrl": "https://api.nawa.app"
+    }
+  }
+}

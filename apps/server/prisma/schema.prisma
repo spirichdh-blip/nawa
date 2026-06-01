@@ -1,0 +1,320 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ──────────────────────────────────────────────
+// 사용자 (자립준비청년 + 전담인력)
+// ──────────────────────────────────────────────
+
+enum UserRole {
+  YOUTH         // 자립준비청년
+  CASE_WORKER   // 전담인력
+  ADMIN
+}
+
+enum ProtectionType {
+  CHILD_CARE_FACILITY   // 아동양육시설
+  GROUP_HOME            // 공동생활가정
+  FOSTER_CARE           // 가정위탁
+  YOUTH_SHELTER         // 청소년쉼터
+  OTHER
+}
+
+enum YouthStatus {
+  STUDENT       // 재학
+  EMPLOYED      // 근로
+  JOB_SEEKING   // 구직
+  INACTIVE      // 비경제활동
+}
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  phone         String?  @unique
+  passwordHash  String
+  name          String
+  role          UserRole @default(YOUTH)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // 자립준비청년 프로필
+  profile       YouthProfile?
+
+  // 전담인력이면
+  caseWorker    CaseWorker?
+
+  // 신청 추적
+  applications  Application[]
+
+  // 매칭된 지원
+  matches       WelfareMatch[]
+
+  // 상황 변동 이력
+  situationLogs SituationLog[]
+
+  // 피드백 제안
+  feedbacks     Feedback[]
+
+  // 앱 마지막 활성 시간 (연락 단절 감지용)
+  lastActiveAt  DateTime @default(now())
+  isAtRisk      Boolean  @default(false)
+}
+
+model YouthProfile {
+  id                   String         @id @default(cuid())
+  userId               String         @unique
+  user                 User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // 기본 정보
+  birthDate            DateTime
+  regionSi             String         // 시/도
+  regionGu             String         // 시/군/구
+  protectionType       ProtectionType
+  protectionEndDate    DateTime       // 보호종료일
+
+  // 현재 상황
+  status               YouthStatus    @default(JOB_SEEKING)
+  isStudent            Boolean        @default(false)
+  schoolName           String?
+  isEmployed           Boolean        @default(false)
+  monthlyIncome        Int            @default(0) // 만 원 단위
+
+  // 수급 현황
+  receivingJaripSudang Boolean        @default(false)  // 자립수당 수급 여부
+  jaripSudangStartDate DateTime?      // 자립수당 시작일
+  jaripSudangEndDate   DateTime?      // 자립수당 종료 예정일 (최대 60개월)
+  receivingBasicLiving Boolean        @default(false)  // 기초생활수급 여부
+  receivingHousing     Boolean        @default(false)  // 주거 지원 여부
+
+  // 자산
+  hasBankAccount       Boolean        @default(true)
+  hasNaeIlCheokChuk    Boolean        @default(false)  // 청년내일저축계좌
+
+  // 알림 설정
+  pushToken            String?
+  notifyDeadline       Boolean        @default(true)
+  notifySituationCheck Boolean        @default(true)
+
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
+}
+
+// ──────────────────────────────────────────────
+// 복지 프로그램 DB
+// ──────────────────────────────────────────────
+
+enum WelfareCategory {
+  LIVING_EXPENSE    // 생활비·자립수당
+  HOUSING           // 주거
+  SCHOLARSHIP       // 등록금·장학금
+  EMPLOYMENT        // 취업·직업훈련
+  MEDICAL           // 의료·건강
+  ASSET_BUILDING    // 자산형성
+  STARTUP           // 창업
+  EMERGENCY         // 긴급복지
+  BASIC_LIVELIHOOD  // 기초생활보장
+  PRIVATE           // 민간 지원
+}
+
+enum WelfareSource {
+  BOKJIRO           // 복지로
+  BOJO24            // 보조금24
+  JARIPJUNGBO       // 자립정보ON
+  KEDI              // 한국장학재단
+  LH                // LH
+  WORK24            // 고용24·워크넷
+  ONTONGYOUTH       // 온통청년
+  LOCAL_GOV         // 지자체
+  CHILD_RIGHTS      // 아동권리보장원
+  GREEN_UMBRELLA    // 초록우산어린이재단
+  OTHER_PRIVATE     // 기타 민간
+}
+
+model WelfareProgram {
+  id              String          @id @default(cuid())
+  name            String
+  description     String
+  category        WelfareCategory
+  source          WelfareSource
+  operator        String          // 운영 기관
+  applyUrl        String?         // 신청 링크
+  infoUrl         String?         // 상세 정보 링크
+
+  // 지원 내용
+  benefitAmount   String?         // 지원 금액/내용 (텍스트)
+  benefitMonthly  Int?            // 월 지원액 (만 원)
+  benefitLumpsum  Int?            // 일시금 (만 원)
+  benefitDuration String?         // 지원 기간
+
+  // 자격 조건 (JSON으로 저장 — 복잡한 조건 처리)
+  eligibility     Json            // 구조화된 자격 조건
+  requiredDocs    String[]        // 필요 서류 목록
+
+  // 신청 기간
+  applyStartDate  DateTime?
+  applyEndDate    DateTime?
+  isYearRound     Boolean         @default(false)  // 상시 신청
+
+  // 지역 제한
+  regionRestrict  String[]        // 빈 배열 = 전국, ["서울"] = 서울만
+
+  // 매칭에 쓰이는 태그
+  tags            String[]
+
+  // 자립수당 종결 후 전환 대상 여부
+  isPostJarip     Boolean         @default(false)
+
+  isActive        Boolean         @default(true)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  matches         WelfareMatch[]
+  applications    Application[]
+}
+
+// ──────────────────────────────────────────────
+// 자격 매칭 결과
+// ──────────────────────────────────────────────
+
+enum MatchStatus {
+  ELIGIBLE        // 자격 있음
+  LIKELY          // 가능성 높음 (일부 조건 불명확)
+  NEEDS_CHECK     // 확인 필요
+  INELIGIBLE      // 자격 없음
+}
+
+model WelfareMatch {
+  id          String         @id @default(cuid())
+  userId      String
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  programId   String
+  program     WelfareProgram @relation(fields: [programId], references: [id])
+
+  status      MatchStatus
+  reasons     String[]       // 자격 판단 근거
+  priority    Int            @default(0)  // 우선순위 (마감 임박, 금액 등)
+  isHidden    Boolean        @default(false)  // 사용자가 숨김 처리
+
+  matchedAt   DateTime       @default(now())
+  expiresAt   DateTime?      // 매칭 만료 (상황 갱신 필요)
+
+  application Application?
+
+  @@unique([userId, programId])
+}
+
+// ──────────────────────────────────────────────
+// 신청 추적
+// ──────────────────────────────────────────────
+
+enum ApplicationStatus {
+  SAVED           // 저장만 함
+  DOC_PREPARING   // 서류 준비 중
+  READY           // 준비 완료, 신청 대기
+  SUBMITTED       // 신청 완료
+  UNDER_REVIEW    // 심사 중
+  APPROVED        // 승인
+  REJECTED        // 반려
+  RECEIVING       // 수급 중
+  ENDED           // 수급 종료
+}
+
+model Application {
+  id            String            @id @default(cuid())
+  userId        String
+  user          User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  programId     String
+  program       WelfareProgram    @relation(fields: [programId], references: [id])
+  matchId       String?           @unique
+  match         WelfareMatch?     @relation(fields: [matchId], references: [id])
+
+  status        ApplicationStatus @default(SAVED)
+
+  // 서류 체크리스트
+  docChecklist  Json              // { docName: boolean }[]
+
+  // AI 생성 신청서 초안
+  draftContent  String?
+
+  // 사용자 메모
+  notes         String?
+
+  // 마감 알림 발송 이력
+  reminders     Reminder[]
+
+  submittedAt   DateTime?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+}
+
+model Reminder {
+  id            String      @id @default(cuid())
+  applicationId String
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  type          String      // "D-7" | "D-3" | "D-1" | "NEW_MATCH"
+  sentAt        DateTime    @default(now())
+  isRead        Boolean     @default(false)
+}
+
+// ──────────────────────────────────────────────
+// 상황 변동 이력
+// ──────────────────────────────────────────────
+
+model SituationLog {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  changes   Json     // { field, oldValue, newValue }[]
+  triggeredRematch Boolean @default(true)
+
+  createdAt DateTime @default(now())
+}
+
+// ──────────────────────────────────────────────
+// 전담기관 & 전담인력
+// ──────────────────────────────────────────────
+
+model Organization {
+  id          String       @id @default(cuid())
+  name        String
+  region      String       // 담당 지역
+  phone       String?
+  address     String?
+  caseWorkers CaseWorker[]
+  createdAt   DateTime     @default(now())
+}
+
+model CaseWorker {
+  id             String       @id @default(cuid())
+  userId         String       @unique
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+
+  // 담당 청년 (미래 확장: 실제 배정 관계)
+  assignedRegion String?
+
+  createdAt      DateTime     @default(now())
+}
+
+// ──────────────────────────────────────────────
+// 청년 제안 피드백
+// ──────────────────────────────────────────────
+
+model Feedback {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category    String   // "제도개선" | "서비스불편" | "새지원제안" | "기타"
+  content     String
+  isAnonymous Boolean  @default(false)
+  isReviewed  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
