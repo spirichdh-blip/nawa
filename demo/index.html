@@ -22,20 +22,38 @@ body{background:radial-gradient(ellipse at 30% 20%,#0D2B3E 0%,#08160F 50%,#0A1F1
 
 /* ── Phone Shell ── */
 .shell{
-  width:390px;height:844px;background:#111;border-radius:56px;padding:11px;
-  box-shadow:0 0 0 1px rgba(255,255,255,.1),0 0 0 2px rgba(255,255,255,.04),
-    0 50px 120px rgba(0,0,0,.9),0 0 80px rgba(45,155,111,.12);
+  width:393px;height:852px;background:#0A0A0A;border-radius:58px;padding:12px;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.12),
+    0 0 0 3px rgba(255,255,255,.04),
+    inset 0 0 0 1px rgba(255,255,255,.06),
+    0 60px 130px rgba(0,0,0,.95),
+    0 0 100px rgba(45,155,111,.1);
   flex-shrink:0;position:relative;
 }
-.phone{width:100%;height:100%;border-radius:47px;overflow:hidden;position:relative;background:var(--bg)}
-.notch{position:absolute;top:0;left:50%;transform:translateX(-50%);
-  width:120px;height:36px;background:#111;border-radius:0 0 22px 22px;z-index:200}
+/* iPhone 17 Pro 측면 버튼 */
+.shell::before{content:'';position:absolute;right:-3px;top:110px;width:4px;height:70px;background:#1A1A1A;border-radius:2px;box-shadow:0 90px 0 #1A1A1A}
+.shell::after{content:'';position:absolute;left:-3px;top:90px;width:4px;height:42px;background:#1A1A1A;border-radius:2px;box-shadow:0 60px 0 #1A1A1A,0 110px 0 #1A1A1A}
+.phone{width:100%;height:100%;border-radius:48px;overflow:hidden;position:relative;background:var(--bg)}
+/* Dynamic Island */
+.notch{
+  position:absolute;top:14px;left:50%;transform:translateX(-50%);
+  width:126px;height:37px;background:#000;border-radius:20px;z-index:200;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  box-shadow:0 0 0 1px rgba(255,255,255,.06);
+}
+.di-camera{width:12px;height:12px;border-radius:6px;background:#1A1A1A;border:1px solid rgba(255,255,255,.08)}
+.di-speaker{width:44px;height:6px;border-radius:3px;background:#1A1A1A;border:1px solid rgba(255,255,255,.06)}
+/* 홈 인디케이터 */
+.home-indicator{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;background:rgba(0,0,0,.25);border-radius:3px;z-index:110}
+.home-indicator.light-bg{background:rgba(0,0,0,.15)}
+.home-indicator.dark-bg{background:rgba(255,255,255,.3)}
 
 /* Status bar */
 .sbar{
-  position:absolute;top:0;left:0;right:0;height:52px;
+  position:absolute;top:0;left:0;right:0;height:58px;
   display:flex;justify-content:space-between;align-items:flex-end;
-  padding:0 28px 10px;z-index:150;pointer-events:none;transition:color .3s
+  padding:0 32px 10px;z-index:150;pointer-events:none;transition:color .3s
 }
 .sbar.dark{color:rgba(255,255,255,.95)}
 .sbar.light{color:var(--b1)}
@@ -214,7 +232,7 @@ body{background:radial-gradient(ellipse at 30% 20%,#0D2B3E 0%,#08160F 50%,#0A1F1
 .cw-pct-fill{height:100%;border-radius:2px;background:var(--g6)}
 .cw-pct-num{font-size:11px;color:var(--b4);font-weight:600}
 .cw-youth-detail{padding:0 0 96px}
-.cw-yd-hero{padding:52px 20px 20px;background:linear-gradient(135deg,#0F3520,#1A6B4A)}
+.cw-yd-hero{padding:62px 20px 20px;background:linear-gradient(135deg,#0F3520,#1A6B4A)}
 .cw-yd-back{color:rgba(255,255,255,.7);font-size:14px;font-weight:600;cursor:pointer;margin-bottom:12px;display:flex;align-items:center;gap:6px;background:none;border:none;font-family:inherit}
 .cw-yd-nm{font-size:22px;font-weight:800;color:#fff}
 .cw-yd-sub{font-size:13px;color:rgba(255,255,255,.65);margin-top:4px}
@@ -264,7 +282,7 @@ body{background:radial-gradient(ellipse at 30% 20%,#0D2B3E 0%,#08160F 50%,#0A1F1
 .cw-funnel-num{font-size:13px;font-weight:700;color:#fff}
 
 /* ── CALENDAR ── */
-.cal-header{padding:56px 20px 0}
+.cal-header{padding:62px 20px 0}
 .cal-title{font-size:26px;font-weight:800;color:var(--b1)}
 .cal-sub{font-size:13px;color:var(--b3);margin-top:2px}
 .cal-nav{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 8px}
@@ -308,7 +326,7 @@ body{background:radial-gradient(ellipse at 30% 20%,#0D2B3E 0%,#08160F 50%,#0A1F1
 .cal-up-date{font-size:12px;font-weight:600;color:var(--b3)}
 
 /* ── NOTIF ── */
-.notif-header{padding:56px 20px 16px;display:flex;justify-content:space-between;align-items:flex-end}
+.notif-header{padding:62px 20px 16px;display:flex;justify-content:space-between;align-items:flex-end}
 .notif-title{font-size:26px;font-weight:800;color:var(--b1)}
 .notif-read-all{font-size:13px;font-weight:600;color:var(--g6);cursor:pointer}
 .notif-content{padding:0 20px 96px}
@@ -338,7 +356,7 @@ body{background:radial-gradient(ellipse at 30% 20%,#0D2B3E 0%,#08160F 50%,#0A1F1
 ═══════════════════════════ */
 #s-welcome{background:linear-gradient(160deg,#061A0F 0%,#0D3520 18%,#1A6B4A 50%,#2D9B6F 78%,#4EB880 100%)}
 
-.welcome-body{padding:52px 24px 44px;min-height:100%;display:flex;flex-direction:column}
+.welcome-body{padding:62px 24px 44px;min-height:100%;display:flex;flex-direction:column}
 .welcome-logo-area{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px 0}
 .logo-main{font-size:64px;font-weight:900;color:#fff;letter-spacing:-3px;line-height:1;margin-bottom:4px}
 .logo-en{font-size:13px;font-weight:600;color:rgba(255,255,255,.6);letter-spacing:8px;margin-bottom:24px}
@@ -357,7 +375,7 @@ body{background:radial-gradient(ellipse at 30% 20%,#0D2B3E 0%,#08160F 50%,#0A1F1
 /* ═══════════════════════════
    SCREENS 2-6 — ONBOARDING
 ═══════════════════════════ */
-.ob-body{padding:60px 24px 100px;min-height:100%}
+.ob-body{padding:64px 24px 100px;min-height:100%}
 .ob-prog{display:flex;gap:5px;margin-bottom:28px}
 .ob-dot{flex:1;height:4px;border-radius:2px;background:var(--bdr);transition:background .3s}
 .ob-dot.done{background:var(--g6)}
@@ -394,7 +412,7 @@ body{background:radial-gradient(ellipse at 30% 20%,#0D2B3E 0%,#08160F 50%,#0A1F1
 /* ═══════════════════════════
    SCREEN 8 — HOME
 ═══════════════════════════ */
-.home-header{padding:56px 20px 12px;display:flex;justify-content:space-between;align-items:flex-end}
+.home-header{padding:62px 20px 12px;display:flex;justify-content:space-between;align-items:flex-end}
 .home-greeting{display:flex;flex-direction:column;gap:2px}
 .home-logo{font-size:28px;font-weight:900;color:var(--b1);letter-spacing:-1px}
 .home-sub{font-size:13px;color:var(--b3)}
@@ -429,7 +447,7 @@ body{background:radial-gradient(ellipse at 30% 20%,#0D2B3E 0%,#08160F 50%,#0A1F1
 ═══════════════════════════ */
 #s-detail{background:#fff}
 .detail-hero{height:200px;background:linear-gradient(140deg,#0F3520,#2D9B6F);
-  padding:56px 20px 20px;display:flex;flex-direction:column;justify-content:flex-end;position:relative}
+  padding:62px 20px 20px;display:flex;flex-direction:column;justify-content:flex-end;position:relative}
 .detail-close{position:absolute;top:56px;right:20px;width:34px;height:34px;
   border-radius:17px;background:rgba(255,255,255,.2);display:flex;align-items:center;
   justify-content:center;font-size:18px;cursor:pointer;color:#fff;border:none;font-family:inherit}
@@ -461,7 +479,7 @@ body{background:radial-gradient(ellipse at 30% 20%,#0D2B3E 0%,#08160F 50%,#0A1F1
 /* ═══════════════════════════
    SCREEN 10 — APPLICATIONS
 ═══════════════════════════ */
-.app-header{padding:56px 20px 16px}
+.app-header{padding:62px 20px 16px}
 .app-title{font-size:26px;font-weight:800;color:var(--b1)}
 .app-sub{font-size:13px;color:var(--b3);margin-top:3px}
 
@@ -511,7 +529,7 @@ body{background:radial-gradient(ellipse at 30% 20%,#0D2B3E 0%,#08160F 50%,#0A1F1
 /* ═══════════════════════════
    SCREEN 11 — SITUATION
 ═══════════════════════════ */
-.sit-header{padding:56px 20px 20px}
+.sit-header{padding:62px 20px 20px}
 .sit-title{font-size:26px;font-weight:800;color:var(--b1)}
 .sit-sub{font-size:14px;color:var(--b3);margin-top:4px;line-height:1.55}
 
@@ -551,7 +569,7 @@ body{background:radial-gradient(ellipse at 30% 20%,#0D2B3E 0%,#08160F 50%,#0A1F1
 /* ═══════════════════════════
    SCREEN 12 — FEEDBACK
 ═══════════════════════════ */
-.fb-header{padding:56px 20px 20px}
+.fb-header{padding:62px 20px 20px}
 .fb-title{font-size:26px;font-weight:800;color:var(--b1);line-height:1.25}
 .fb-sub{font-size:14px;color:var(--b3);margin-top:6px;line-height:1.55}
 
@@ -590,7 +608,7 @@ body{background:radial-gradient(ellipse at 30% 20%,#0D2B3E 0%,#08160F 50%,#0A1F1
 /* ═══════════════════════════
    SCREEN 13 — CASE WORKER
 ═══════════════════════════ */
-.cw-header{padding:56px 20px 20px;background:linear-gradient(135deg,#0F3520,#1A6B4A)}
+.cw-header{padding:62px 20px 20px;background:linear-gradient(135deg,#0F3520,#1A6B4A)}
 .cw-badge{display:inline-block;padding:4px 10px;background:rgba(255,255,255,.15);
   border-radius:20px;font-size:11px;font-weight:600;color:rgba(255,255,255,.8);margin-bottom:8px}
 .cw-ttl{font-size:22px;font-weight:800;color:#fff}
@@ -677,7 +695,8 @@ body{background:radial-gradient(ellipse at 30% 20%,#0D2B3E 0%,#08160F 50%,#0A1F1
 <!-- Phone -->
 <div class="shell">
   <div class="phone" id="phone">
-    <div class="notch"></div>
+    <div class="notch"><div class="di-camera"></div><div class="di-speaker"></div></div>
+    <div class="home-indicator" id="home-ind"></div>
 
     <!-- Status bar -->
     <div class="sbar dark" id="sbar">
@@ -2233,8 +2252,24 @@ function updateTime() {
 updateTime();
 setInterval(updateTime, 30000);
 
+// ── Home indicator ──
+function syncHI(id){
+  var ind=document.getElementById('home-ind');
+  if(!ind)return;
+  var dark=['s-welcome','s-matching','s-cw','s-cw-roster','s-cw-schedule','s-cw-report'];
+  ind.className='home-indicator '+(dark.indexOf(id)>=0?'dark-bg':'light-bg');
+}
+var _origUI=updateUI;
+updateUI=function(id){_origUI(id);syncHI(id);};
+var ni=document.querySelector('.notch');
+if(ni)ni.addEventListener('click',function(){
+  ni.style.cssText+='transition:all .35s cubic-bezier(.34,1.56,.64,1);width:200px;height:54px;border-radius:28px;';
+  setTimeout(function(){ni.style.width='126px';ni.style.height='37px';ni.style.borderRadius='20px';},1300);
+});
+
 // Init
 updateSideNav('s-welcome');
+syncHI('s-welcome');
 </script>
 </body>
 </html>
